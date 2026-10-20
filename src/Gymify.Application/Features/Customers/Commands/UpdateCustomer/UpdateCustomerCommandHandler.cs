@@ -1,6 +1,3 @@
-using AutoMapper;
-using ErrorOr;
-using Gymify.Application.Common.CQRS;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer.Specifications;
 using Gymify.Application.ServicesContracts.Infrastructure;
 using Gymify.Domain.Common.Constants;
@@ -12,16 +9,11 @@ namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPhoneNumberService _phoneNumberService;
-        private readonly IMapper _mapper;
 
-        public UpdateCustomerCommandHandler(
-            IUnitOfWork unitOfWork,
-            IPhoneNumberService phoneNumberService,
-            IMapper mapper)
+        public UpdateCustomerCommandHandler(IUnitOfWork unitOfWork, IPhoneNumberService phoneNumberService)
         {
             _unitOfWork = unitOfWork;
             _phoneNumberService = phoneNumberService;
-            _mapper = mapper;
         }
 
         public async Task<ErrorOr<UpdateCustomerCommandResponse>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
@@ -77,7 +69,26 @@ namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return _mapper.Map<UpdateCustomerCommandResponse>(customer);
+            return new UpdateCustomerCommandResponse
+            {
+                Id = customer.Id,
+                CustomerId = customer.Id,
+                UserId = customer.DomainUserId,
+                Name = customer.DomainUser.Name,
+                Email = customer.DomainUser.Email,
+                PhoneNumber = customer.DomainUser.PhoneNumber,
+                IsActive = customer.DomainUser.IsActive,
+                Code = customer.Code,
+                Height = customer.Height,
+                Weight = customer.Weight,
+                Age = customer.Age,
+                Injuries = customer.Injuries,
+                ChronicDiseases = customer.ChronicDiseases,
+                MusclePercentage = customer.MusclePercentage,
+                FatPercentage = customer.FatPercentage,
+                Notes = customer.Notes,
+                ApprovalStatus = customer.ApprovalStatus
+            };
         }
     }
 }

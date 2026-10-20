@@ -1,4 +1,5 @@
 using FluentValidation;
+using Gymify.Application.Features.Customers.Shared;
 
 namespace Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus
 {
@@ -6,13 +7,13 @@ namespace Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalS
     {
         public ChangeCustomerApprovalStatusCommandValidator()
         {
-            RuleFor(x => x.CustomerId)
-                .GreaterThan(0)
-                .WithMessage("Customer ID must be greater than zero.");
+            ApplyValidationRules();
+        }
 
-            RuleFor(x => x.Status)
-                .IsInEnum()
-                .WithMessage("Invalid approval status.");
+        private void ApplyValidationRules()
+        {
+            RuleFor(x => x.CustomerId).ApplyCustomerIdRules();
+            RuleFor(x => x.Status).ApplyApprovalStatusRules();
         }
     }
 }

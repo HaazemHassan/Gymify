@@ -1,0 +1,44 @@
+[
+  {
+    "Name": "Super Admin",
+    "Email": "superadmin@gymify.com",
+    "PhoneNumber": "01000000000",
+    "Address": "Cairo, Egypt",
+    "Password": "12345678Hh",
+    "Role": "SuperAdmin"
+  },
+  {
+    "Name": "Trainer Ahmed",
+    "Email": "trainer@project.com",
+    "PhoneNumber": "01234567893",
+    "Address": "Cairo, Egypt",
+    "Password": "12345678Hh",
+    "Role": "Trainer"
+  },
+  {
+    "Name": "Manager Sara",
+    "Email": "manager@project.com",
+    "PhoneNumber": "01234567894",
+    "Address": "Cairo, Egypt",
+    "Password": "12345678Hh",
+    "Role": "Manager"
+  },
+  {
+    "Name": "Gator Mohamed",
+    "Email": "gator@project.com",
+    "PhoneNumber": "01234567895",
+    "Address": "Cairo, Egypt",
+    "Password": "12345678Hh",
+    "Role": "Gator"
+  },
+  {
+    "Name": "Customer User",
+    "Email": "member@project.com",
+    "PhoneNumber": "01234567892",
+    "Address": "Giza, Egypt",
+    "Password": "12345678Hh",
+    "Role": "Customer",
+    "ApprovalStatus": "Approved",
+    "IsActive": true
+  }
+]

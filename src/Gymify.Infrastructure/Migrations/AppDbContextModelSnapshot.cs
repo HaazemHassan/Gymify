@@ -73,6 +73,10 @@ namespace Gymify.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CheckOutAt] IS NULL AND [IsDeleted] = 0");
 
+                    b.HasIndex("Id")
+                        .HasDatabaseName("IX_Attendances_ActiveOccupancy")
+                        .HasFilter("[CheckOutAt] IS NULL AND [IsDeleted] = 0");
+
                     b.HasIndex("LockerId")
                         .IsUnique()
                         .HasFilter("[CheckOutAt] IS NULL AND [IsDeleted] = 0");
@@ -426,6 +430,9 @@ namespace Gymify.Infrastructure.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -457,6 +464,9 @@ namespace Gymify.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -465,9 +475,9 @@ namespace Gymify.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("PackageId");
+
+                    b.HasIndex("CustomerId", "EndDate");
 
                     b.ToTable("Subscriptions", "gym");
                 });

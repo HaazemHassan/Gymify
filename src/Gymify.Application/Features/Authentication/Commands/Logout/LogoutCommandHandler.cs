@@ -1,0 +1,20 @@
+using Gymify.Application.ServicesContracts.Infrastructure;
+using Gymify.Domain.RepositoriesContracts;
+
+namespace Gymify.Application.Features.Authentication.Commands.Logout;
+
+public class LogoutCommandHandler(IAuthenticationService _authenticationService, IUnitOfWork _unitOfWork)
+    : ICommandHandler<LogoutCommand>
+{
+
+    public async Task<ErrorOr<Success>> Handle(LogoutCommand request, CancellationToken cancellationToken)
+    {
+        var serviceResult = await _authenticationService.LogoutAsync(request.RefreshToken!);
+        if (!serviceResult.IsError)
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        }
+        return serviceResult;
+    }
+}

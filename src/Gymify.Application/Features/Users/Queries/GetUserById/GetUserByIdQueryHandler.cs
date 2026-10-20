@@ -1,0 +1,30 @@
+using AutoMapper;
+using Gymify.Application.Specifications.Shared;
+using Gymify.Domain.Common.Constants;
+using Gymify.Domain.Entities;
+using Gymify.Domain.RepositoriesContracts;
+
+namespace Gymify.Application.Features.Users.Queries.GetUserById
+{
+    public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, GetUserByIdQueryResponse>
+    {
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GetUserByIdQueryHandler(IMapper mapper, IUnitOfWork unitOfWork)
+        {
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<ErrorOr<GetUserByIdQueryResponse>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        {
+            var spec = new GetByIdSpec<DomainUser>(request.UserId);
+            var user = await _unitOfWork.Users.GetAsync<GetUserByIdQueryResponse>(spec, cancellationToken);
+            if (user is null)
+                return Error.NotFound(code: ErrorCodes.User.UserNotFound, description: "User not found");
+
+            return user;
+        }
+    }
+}

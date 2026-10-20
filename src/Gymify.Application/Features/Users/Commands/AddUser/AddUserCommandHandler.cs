@@ -1,0 +1,41 @@
+//using AutoMapper;
+//using ErrorOr;
+//using MediatR;
+//using Gymify.Application.Contracts.Infrastructure;
+//using Gymify.Application.ServicesContracts.Infrastructure;
+//using Gymify.Domain.Entities;
+//using Gymify.Domain.Repositories;
+
+//namespace Gymify.Application.Features.Users.Commands.AddUser
+//{
+//    public class AddUserCommandHandler : ICommandHandler<AddUserCommand, AddUserCommandResponse>
+//    {
+
+//        private readonly IUnitOfWork _unitOfWork;
+//        private readonly IMapper _mapper;
+//        private readonly IApplicationUserService _applicationUserService;
+//        private readonly IPhoneNumberService _phoneNumberService;
+
+//        public AddUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IApplicationUserService applicationUserService, IPhoneNumberService phoneNumberService)
+//        {
+//            _unitOfWork = unitOfWork;
+//            _mapper = mapper;
+//            _applicationUserService = applicationUserService;
+//            _phoneNumberService = phoneNumberService;
+//        }
+
+//        public async Task<ErrorOr<AddUserCommandResponse>> Handle(AddUserCommand request, CancellationToken cancellationToken)
+//        {
+//            var phoneNumberNormalized = _phoneNumberService.Normalize(request.PhoneNumber!);
+
+//            var domainUser = new DomainUser(request.FirstName, request.LastName, request.Email, phoneNumberNormalized);
+//            var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, request.UserRole, cancellationToken);
+
+//            if (addUserResult.IsError)
+//                return addUserResult.Errors;
+
+//            var response = _mapper.Map<AddUserCommandResponse>(addUserResult.Value);
+//            return response;
+//        }
+//    }
+//}

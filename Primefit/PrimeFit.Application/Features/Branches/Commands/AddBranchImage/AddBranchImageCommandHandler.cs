@@ -1,0 +1,96 @@
+using PrimeFit.Application.Contracts.Api;
+using PrimeFit.Application.Security.Contracts;
+using PrimeFit.Application.ServicesContracts.Infrastructure;
+using PrimeFit.Domain.Common.Constants;
+using PrimeFit.Domain.Common.Enums;
+using PrimeFit.Domain.Entities;
+using PrimeFit.Domain.RepositoriesContracts;
+
+namespace PrimeFit.Application.Features.Branches.Commands.CreateBranchImage
+{
+    public class AddBranchImageCommandHandler : ICommandHandler<AddBranchImageCommand, AddBranchImageCommandResponse>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IImageService _imageService;
+        private readonly IImageBackgroundService _imageBackgroundQueue;
+
+
+        public AddBranchImageCommandHandler(
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService,
+            IImageService imageService,
+            IImageBackgroundService imageBackgroundQueue)
+        {
+            _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
+            _imageService = imageService;
+            _imageBackgroundQueue = imageBackgroundQueue;
+        }
+
+        public async Task<ErrorOr<AddBranchImageCommandResponse>> Handle(AddBranchImageCommand request, CancellationToken cancellationToken)
+        {
+            var currentUserId = _currentUserService.UserId!.Value;
+
+            var branch = await _unitOfWork.Branches.GetByIdAsync(request.BranchId, cancellationToken);
+
+            if (branch is null)
+            {
+                return Error.NotFound(
+                    ErrorCodes.Branch.BranchNotFound,
+                    "Branch not found");
+            }
+
+
+
+            var generatedFileName = $"branch-{request.BranchId}-{request.ImageType}-{Guid.NewGuid()}";
+
+            var imageUploadResult = await _imageService.UploadAsync(request.ImageStream, generatedFileName, cancellationToken);
+
+            if (imageUploadResult.IsError)
+            {
+                return imageUploadResult.Errors;
+            }
+
+
+            var uploadedImageData = imageUploadResult.Value;
+
+            var image = new BranchImage(
+                uploadedImageData.SecureUrl,
+                uploadedImageData.PublicId,
+                request.ImageType,
+                request.BranchId,
+                request.DisplayOrder);
+
+
+            var addImageToBranchResult = branch.AddImage(image);
+
+            if (addImageToBranchResult.IsError)
+            {
+                _imageBackgroundQueue.DeleteImage(uploadedImageData.PublicId!);
+                return addImageToBranchResult.Errors;
+            }
+
+            try
+            {
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            }
+            catch
+            {
+                _imageBackgroundQueue.DeleteImage(uploadedImageData.PublicId!);
+                throw;
+            }
+
+            return new AddBranchImageCommandResponse
+            {
+                BranchId = request.BranchId,
+                ImageId = image.Id,
+                ImageUrl = uploadedImageData.SecureUrl,
+                Status = image.Status,
+                DisplayOrder = image.DisplayOrder
+            };
+        }
+
+    }
+}

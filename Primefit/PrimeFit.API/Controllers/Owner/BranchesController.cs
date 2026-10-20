@@ -1,0 +1,414 @@
+using AutoMapper;
+using PrimeFit.Api.Requests.Branches.AddBranchImage;
+using PrimeFit.Api.Requests.Branches.UpdateBranchImage;
+using PrimeFit.Api.Requests.Branches.GetBranchById;
+using PrimeFit.Api.Requests.Branches.ActivateBranchImages;
+using PrimeFit.Api.Requests.Branches.GetBranchStatistics;
+using PrimeFit.Api.Requests.Branches.GetOwnerBranchesStatistics;
+using PrimeFit.Api.Requests.Branches.UpdateBranchStatus;
+using PrimeFit.Api.Requests.Branches.UpdateBasicDetails;
+using PrimeFit.Api.Requests.Branches.UpdateLocationDetailsRequest;
+using PrimeFit.Api.Requests.Branches.UpdateWorkingHoursRequest;
+using PrimeFit.Api.Requests.BranchPackages.AddPackage;
+using PrimeFit.Api.Requests.BranchPackages.UpdatePackage;
+using PrimeFit.Api.Requests.BranchPackages.UpdatePackageStatus;
+using PrimeFit.Api.Requests.BranchPackages.GetBranchPackagesForCustomers;
+using PrimeFit.Api.Requests.Employees.GetBranchEmployees;
+using PrimeFit.Api.Requests.Employees.UpdateEmployeeRequest;
+using PrimeFit.Api.Requests.Subscriptions.AddSubscription;
+using PrimeFit.Api.Requests.Subscriptions.CreateMemberWithSubscription;
+using PrimeFit.Api.Requests.Subscriptions.GetBranchSubscriptions;
+using PrimeFit.Api.Requests.Subscriptions.GetSubscriptionAttendanceHistory;
+using PrimeFit.Api.Requests.Common.Pagination;
+using PrimeFit.Api.Requests.Users.UpdateProfile;
+using PrimeFit.Api.Requests.BranchReviews;
+using PrimeFit.Api.Requests.BranchReviews.GetBranchReviewsRequest;
+using PrimeFit.Api.Requests.Branches.CreateBranch;
+using PrimeFit.Api.Requests.Notifications;
+using PrimeFit.Api.Requests.Payments;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using PrimeFit.API.Common.Constants;
+using PrimeFit.Application.Features.Branches.Commands.ActivateBranchImages;
+using PrimeFit.Application.Features.Branches.Commands.CreateBranch;
+using PrimeFit.Application.Features.Branches.Commands.CreateBranchImage;
+using PrimeFit.Application.Features.Branches.Commands.CreateMemberWithSubscription;
+using PrimeFit.Application.Features.Branches.Commands.UpdateBasicDetails;
+using PrimeFit.Application.Features.Branches.Commands.UpdateBranchStatus;
+using PrimeFit.Application.Features.Branches.Commands.UpdateLocationDetails;
+using PrimeFit.Application.Features.Branches.Commands.UpdateWorkingHours;
+using PrimeFit.Application.Features.Branches.Queries.GetBranchSetupDetails;
+using PrimeFit.Application.Features.Branches.Queries.GetBranchStatistics;
+using PrimeFit.Application.Features.BranchPackages.Commands.AddPackage;
+using PrimeFit.Application.Features.BranchPackages.Commands.DeletePackage;
+using PrimeFit.Application.Features.BranchPackages.Commands.UpdatePackage;
+using PrimeFit.Application.Features.BranchPackages.Commands.UpdatePackageStatus;
+using PrimeFit.Application.Features.BranchPackages.Queries.GetBranchPackages;
+using PrimeFit.Application.Features.Employees.Queries.GetBranchEmployees;
+using PrimeFit.Application.Features.Subscriptions.Commands.AddSubscription;
+using PrimeFit.Application.Features.Subscriptions.Queries.GetBranchSubscriptions;
+
+namespace PrimeFit.API.Controllers.Owner
+{
+    public class BranchesController : OwnerBaseController
+    {
+        private readonly IMapper _mapper;
+        private readonly IValidator<AddBranchImageRequest> _addBranchImageValidator;
+        private readonly IValidator<UpdateBranchImageRequest> _updateLocationDetailsValidator;
+
+        public BranchesController(IMapper mapper, IValidator<AddBranchImageRequest> addBranchImageValidator, IValidator<UpdateBranchImageRequest> updateLocationDetailsValidator)
+        {
+            _mapper = mapper;
+            _addBranchImageValidator = addBranchImageValidator;
+            _updateLocationDetailsValidator = updateLocationDetailsValidator;
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> AddBranch([FromBody] CreateBranchRequest request)
+        {
+            var command = _mapper.Map<CreateBranchCommand>(request);
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return CreatedAtRoute(RouteNames.Branches.GetBranchById, new { branchId = result.Value.Id }, result.Value);
+        }
+
+
+
+        [HttpPatch("{branchId:int}/bussiness-details")]
+        public async Task<IActionResult> UpdateBusinessDetails([FromRoute] int branchId, [FromBody] UpdateBasicDetailsRequest request)
+        {
+
+            var command = _mapper.Map<UpdateBasicDetailsCommand>(request);
+            command.BranchId = branchId;
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return NoContent();
+        }
+
+
+        [HttpPatch("{branchId:int}/location-details")]
+        public async Task<IActionResult> UpdateLocationDetails([FromRoute] int branchId, [FromBody] UpdateLocationDetailsRequest request)
+        {
+
+            var command = _mapper.Map<UpdateLocationDetailsCommand>(request);
+            command.BranchId = branchId;
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return NoContent();
+        }
+
+        [HttpPatch("{branchId:int}/working-hours")]
+        public async Task<IActionResult> UpdateWorkingHoursDetails([FromRoute] int branchId, [FromBody] UpdateWorkingHoursRequest request)
+        {
+
+            var command = _mapper.Map<UpdateWorkingHoursCommand>(request);
+            command.BranchId = branchId;
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPatch("{branchId:int}/status")]
+        public async Task<IActionResult> UpdateBranchStatus([FromRoute] int branchId, [FromBody] UpdateBranchStatusRequest request)
+        {
+            var command = new UpdateBranchStatusCommand
+            {
+                BranchId = branchId,
+                BranchStatus = request.BranchStatus
+            };
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return NoContent();
+        }
+
+
+
+        [HttpGet("{branchId:int}/setup-details")]
+        public async Task<IActionResult> GetBranchSetupDetails([FromRoute] int branchId)
+        {
+            var query = new GetBranchSetupDetailsQuery
+            {
+                BranchId = branchId
+            };
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+
+        [HttpPost("{branchId:int}/images")]
+        public async Task<IActionResult> AddBranchImage([FromRoute] int branchId, [FromForm] AddBranchImageRequest request)
+        {
+            var validationResult = await _addBranchImageValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException("Validation Exception", validationResult.Errors);
+            }
+
+            using var stream = request.ImageFile.OpenReadStream();
+
+            var command = new AddBranchImageCommand
+            {
+                BranchId = branchId,
+                ImageStream = stream,
+                ImageType = request.ImageType,
+                DisplayOrder = request.DisplayOrder
+            };
+
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+
+        }
+
+
+        [HttpPatch("{branchId:int}/images/activate")]
+        public async Task<IActionResult> ActivateBranchImage(int branchId, [FromBody] ActivateBranchImagesRequest request)
+        {
+
+            var command = new ActivateBranchImagesCommand
+            {
+                BranchId = branchId,
+                Images = request.Images,
+            };
+
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+
+        }
+
+
+
+        [HttpPost("{branchId:int}/packages")]
+        public async Task<IActionResult> AddPackage([FromRoute] int branchId, [FromBody] AddPackageRequest request)
+        {
+            var command = _mapper.Map<AddPackageCommand>(request);
+            command.BranchId = branchId;
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+        [HttpPatch("{branchId:int}/packages/{packageId:int}")]
+        public async Task<IActionResult> UpdatePackage([FromRoute] int branchId, [FromRoute] int packageId, [FromBody] UpdatePackageRequest request)
+        {
+            var command = _mapper.Map<UpdatePackageCommand>(request);
+            command.BranchId = branchId;
+            command.PackageId = packageId;
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+
+        [HttpPatch("{branchId:int}/packages/{packageId:int}/status")]
+        public async Task<IActionResult> UpdatePackageStatus([FromRoute] int branchId, [FromRoute] int packageId, [FromBody] UpdatePackageStatusRequest request)
+        {
+            var command = new UpdatePackageStatusCommand
+            {
+                BranchId = branchId,
+                PackageId = packageId,
+                IsActive = request.IsActive
+            };
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{branchId:int}/packages/{packageId:int}")]
+        public async Task<IActionResult> DeletePackage([FromRoute] int branchId, [FromRoute] int packageId)
+        {
+            var command = new DeletePackageCommand
+            {
+                BranchId = branchId,
+                PackageId = packageId
+            };
+
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return NoContent();
+        }
+
+
+        [HttpGet("{branchId:int}/packages")]
+        public async Task<IActionResult> GetBranchPackages([FromRoute] int branchId, [FromQuery] BasicPaginationRequest request)
+        {
+
+            var query = _mapper.Map<GetBranchPackagesQuery>(request);
+            query.BranchId = branchId;
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+
+        [HttpGet("{branchId:int}/employees")]
+        public async Task<IActionResult> GetBranchEmployees([FromRoute] int branchId, [FromQuery] GetBranchEmployeesRequest request)
+        {
+            var query = new GetBranchEmployeesQuery
+            {
+                BranchId = branchId,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+
+
+
+        [HttpPost("{branchId:int}/members")]
+        public async Task<IActionResult> CreateMemberWithSubscription([FromRoute] int branchId, [FromBody] CreateMemberWithSubscriptionRequest request)
+        {
+
+            var command = _mapper.Map<CreateMemberWithSubscriptionCommand>(request);
+            command.BranchId = branchId;
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+
+            return CreatedAtRoute(RouteNames.Subscriptions.GetSubscriptionById, new { subscriptionId = result.Value.Id }, result.Value);
+        }
+
+
+
+        [HttpPost("{branchId:int}/subscriptions")]
+        public async Task<IActionResult> AddSubscription([FromRoute] int branchId, [FromBody] AddSubscriptionRequest request/*, [FromHeader(Name = "x-request-id")] string requestId*/)
+        {
+
+            var command = new AddSubscriptionCommand()
+            {
+                Email = request.Email,
+                PackageId = request.PackageId,
+                BranchId = branchId
+
+            };
+            var result = await Mediator.Send(command);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+
+            return CreatedAtRoute(RouteNames.Subscriptions.GetSubscriptionById, new { SubscriptionId = result.Value.Id }, result.Value);
+        }
+
+
+        [HttpGet("{branchId:int}/subscriptions")]
+        public async Task<IActionResult> GetSubscriptions([FromRoute] int branchId, [FromQuery] GetBranchSubscriptionsRequest request)
+        {
+
+            var query = _mapper.Map<GetBranchSubscriptionsQuery>(request);
+            query.BranchId = branchId;
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+        [HttpGet("{branchId:int}/statistics")]
+        public async Task<IActionResult> GetBranchStatistics([FromRoute] int branchId, [FromQuery] GetBranchStatisticsRequest request)
+        {
+            var query = new GetBranchStatisticsQuery(branchId)
+            {
+                TimePeriod = request.TimePeriod
+            };
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetOwnerBranchesStatistics([FromQuery] GetOwnerBranchesStatisticsRequest request)
+        {
+            var query = new PrimeFit.Application.Features.Branches.Queries.GetOwnerBranchesStatistics.GetOwnerBranchesStatisticsQuery()
+            {
+                TimePeriod = request.TimePeriod
+            };
+
+            var result = await Mediator.Send(query);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+            return Ok(result.Value);
+        }
+
+
+
+
+
+
+
+    }
+}

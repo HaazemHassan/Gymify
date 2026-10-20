@@ -1,0 +1,284 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using PrimeFit.API.Common;
+using PrimeFit.API.Common.Exceptions;
+using PrimeFit.API.RateLimiting;
+using PrimeFit.API.Services;
+using PrimeFit.Application;
+using PrimeFit.Application.Contracts.Api;
+using PrimeFit.Domain.Services;
+using PrimeFit.Domain.ServicesContracts;
+using PrimeFit.Infrastructure;
+using PrimeFit.Infrastructure.Common.Options;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.RateLimiting;
+
+
+
+
+namespace PrimeFit.API
+{
+    public static class ApiServiceRegistration
+    {
+        private const string GuestIdKey = "GuestId";   // used for ratelimiting
+
+        public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            AddDomainServices(services);
+            services.AddApplication();
+            services.AddInfrastructure(configuration);
+            AddApi(services, configuration, environment);
+
+
+            return services;
+
+
+        }
+
+
+        private static IServiceCollection AddApi(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.SetIsOriginAllowed(_ => true) // Allow any origin
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials(); // SignalR requires credentials
+                });
+            });
+
+            services.AddControllers();
+            services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
+
+            AddAuthenticationConfigurations(services, configuration, environment);
+            AddSwaggerConfigurations(services);
+            AddRateLimitingConfigurations(services, configuration);
+
+            // Register Exception Handler
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+
+            #region Api Services
+            services.AddTransient<ICurrentUserService, CurrentUserService>();
+            services.AddTransient<IClientContextService, ClientContextService>();
+            #endregion
+
+            return services;
+        }
+
+
+
+        private static IServiceCollection AddSwaggerConfigurations(IServiceCollection services)
+        {
+            // Swagger Configuration
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "PrimeFit API",
+                    Version = "v1",
+                    Description = "API for PrimeFit application"
+                });
+
+
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                {
+                    options.IncludeXmlComments(xmlPath);
+                }
+
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme {
+                            Reference = new OpenApiReference {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
+            return services;
+        }
+
+
+        private static IServiceCollection AddAuthenticationConfigurations(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+
+
+            var jwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+           .AddJwtBearer(x =>
+           {
+               x.RequireHttpsMetadata = !environment.IsDevelopment();
+               x.SaveToken = true;
+               x.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuer = jwtSettings.ValidateIssuer,
+                   ValidIssuer = jwtSettings.Issuer,
+                   ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                   ValidAudience = jwtSettings.Audience,
+                   ValidateAudience = jwtSettings.ValidateAudience,
+                   ValidateLifetime = jwtSettings.ValidateLifeTime,
+                   ClockSkew = TimeSpan.Zero
+               };
+
+               x.Events = new JwtBearerEvents
+               {
+                   OnMessageReceived = context =>
+                   {
+                       var accessToken = context.Request.Query["access_token"];
+                       var path = context.HttpContext.Request.Path;
+                       // Read the token out of the query string for SignalR requests
+                       if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                       {
+                           context.Token = accessToken;
+                       }
+                       return Task.CompletedTask;
+                   }
+               };
+           }
+        );
+
+            return services;
+        }
+
+        public static IServiceCollection AddRateLimitingConfigurations(
+         this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<RateLimitingOptions>(configuration.GetSection(RateLimitingOptions.SectionName));
+
+
+
+            var rateLimitingSettings = configuration.GetSection(RateLimitingOptions.SectionName).Get<RateLimitingOptions>();
+
+            services.AddRateLimiter(options =>
+            {
+                options.AddPolicy(RateLimitingPolicies.DefaultLimiter, httpContext =>
+                {
+                    string partitionKey;
+                    var user = httpContext.User?.Identity?.Name;
+
+                    if (!string.IsNullOrEmpty(user))
+                        partitionKey = user;
+
+                    else if (httpContext.Items.TryGetValue(GuestIdKey, out var guestId) && guestId is string guestIdString)
+                        partitionKey = guestIdString;
+
+                    else
+                        partitionKey = GetFallbackPartitionKey(httpContext);
+
+
+                    return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, key => new SlidingWindowRateLimiterOptions
+                    {
+                        Window = TimeSpan.FromMinutes(rateLimitingSettings.DefaultLimiter.WindowMinutes),
+                        PermitLimit = rateLimitingSettings.DefaultLimiter.PermitLimit,
+                        QueueLimit = rateLimitingSettings.DefaultLimiter.QueueLimit,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        SegmentsPerWindow = rateLimitingSettings.DefaultLimiter.SegmentsPerWindow
+                    });
+                });
+
+                options.AddPolicy(RateLimitingPolicies.LoginLimiter, httpContext =>
+                {
+                    string partitionKey;
+
+                    if (httpContext.Items.TryGetValue(GuestIdKey, out var guestId) && guestId is string guestIdString)
+                        partitionKey = guestIdString;
+
+                    else
+                        partitionKey = GetFallbackPartitionKey(httpContext);
+
+
+                    return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, key => new SlidingWindowRateLimiterOptions
+                    {
+                        Window = TimeSpan.FromMinutes(rateLimitingSettings.LoginLimiter.WindowMinutes),
+                        PermitLimit = rateLimitingSettings.LoginLimiter.PermitLimit,
+                        QueueLimit = rateLimitingSettings.LoginLimiter.QueueLimit,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        SegmentsPerWindow = rateLimitingSettings.LoginLimiter.SegmentsPerWindow
+                    });
+                });
+
+                options.OnRejected = async (context, token) =>
+                {
+                    if (context.HttpContext.Response.HasStarted)
+                    {
+                        return;
+                    }
+
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    context.HttpContext.Response.ContentType = "application/json";
+
+                    int retryAfterSeconds = rateLimitingSettings.RetryAfterSeconds;
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                    {
+                        retryAfterSeconds = (int)Math.Ceiling(retryAfter.TotalSeconds);
+                    }
+                    context.HttpContext.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
+
+                    var response = new
+                    {
+                        StatusCode = StatusCodes.Status429TooManyRequests,
+                        Message = "Too many requests. Please try again later.",
+                        Succeeded = false
+                    };
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken: token);
+                };
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
+
+            return services;
+
+            static string GetFallbackPartitionKey(HttpContext httpContext)
+            {
+                var clientContextService = httpContext.RequestServices.GetRequiredService<IClientContextService>();
+                var ip = clientContextService.GetClientIpAddress();
+                var userAgent = httpContext.Request.Headers.UserAgent;
+
+                var identifier = $"{ip}-{userAgent}";
+                var bytes = Encoding.UTF8.GetBytes(identifier);
+                var hash = SHA256.HashData(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+        private static IServiceCollection AddDomainServices(IServiceCollection services)
+        {
+            services.AddScoped<ISubscriptionDomainService, SubscriptionService>();
+            return services;
+
+        }
+
+
+    }
+}
+

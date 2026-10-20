@@ -1,0 +1,32 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PrimeFit.Domain.Entities;
+
+namespace PrimeFit.Infrastructure.Data.Configurations.BranchEntities
+{
+    public class BranchWorkingHourConfiguration : IEntityTypeConfiguration<BranchWorkingHour>
+    {
+        public void Configure(EntityTypeBuilder<BranchWorkingHour> builder)
+        {
+            builder.ToTable("BranchWorkingHours", "branches");
+            builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.Day).IsRequired();
+
+            builder.Property(x => x.OpenTime);
+            builder.Property(x => x.CloseTime);
+
+            builder.Property(x => x.IsClosed).HasDefaultValue(false);
+
+
+            builder.HasOne(x => x.Branch)
+                .WithMany(b => b.WorkingHours)
+                .HasForeignKey(x => x.BranchId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasQueryFilter(x => !x.Branch.IsDeleted);
+
+            builder.HasIndex(x => new { x.BranchId, x.Day }).IsUnique();
+        }
+    }
+}

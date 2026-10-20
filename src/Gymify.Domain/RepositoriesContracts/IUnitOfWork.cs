@@ -1,0 +1,22 @@
+using Gymify.Domain.Repositories;
+
+namespace Gymify.Domain.RepositoriesContracts;
+
+public interface IUnitOfWork
+{
+
+    IUserRepository Users { get; }
+    ICustomerRepository Customers { get; }
+    IPackageRepository Packages { get; }
+    IRefreshTokenRepository RefreshTokens { get; }
+    IVerificationCodeRepository VerificationCodes { get; }
+
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<IDatabaseTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+
+    bool HasCurrentTransaction();
+
+    IDatabaseExecutionStrategy CreateExecutionStrategy();
+
+}

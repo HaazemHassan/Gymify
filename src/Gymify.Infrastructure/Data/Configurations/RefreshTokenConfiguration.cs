@@ -1,0 +1,33 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Gymify.Domain.Entities;
+
+namespace Gymify.Infrastructure.Data.Configurations
+{
+    internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
+    {
+        public void Configure(EntityTypeBuilder<RefreshToken> builder)
+        {
+            builder.ToTable("RefreshTokens", "auth");
+
+            builder.HasKey(rt => rt.Id);
+
+            builder.Property(rt => rt.Token)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            builder.Property(rt => rt.AccessTokenJTI)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(rt => rt.Expires)
+                .IsRequired();
+
+            builder.Property(rt => rt.CreatedAt)
+                .IsRequired();
+
+            builder.HasIndex(rt => rt.Token);
+            builder.HasIndex(rt => rt.UserId);
+        }
+    }
+}

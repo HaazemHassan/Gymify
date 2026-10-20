@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "SuperAdmin",
+    "Permissions": [
+      "UsersRead",
+      "UsersWrite",
+      "UsersDelete"
+    ]
+  },
+  {
+    "Name": "Trainer",
+    "Permissions": [
+      "UsersRead"
+    ]
+  },
+  {
+    "Name": "Manager",
+    "Permissions": [
+      "UsersRead",
+      "UsersWrite",
+      "UsersDelete"
+    ]
+  },
+  {
+    "Name": "Gator",
+    "Permissions": [
+      "UsersRead"
+    ]
+  }
+]

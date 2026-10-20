@@ -1,0 +1,25 @@
+using PrimeFit.Application.Features.Authentication.Commands.SignIn;
+using PrimeFit.Domain.Common.Enums;
+using System.Text.Json.Serialization;
+
+namespace PrimeFit.Application.Features.Users.Common
+{
+    public class UserBaseResponse
+    {
+
+        [JsonPropertyOrder(-1)]
+        public int Id { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public bool EmailConfirmed { get; set; }
+        public UserType UserType { get; set; }
+        public UserRole? UserRole { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public string? SecretKey { get; set; }
+        public EmployeeBranchContextDto? WorksAtBranch { get; set; }
+
+    }
+}

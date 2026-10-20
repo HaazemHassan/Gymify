@@ -1,0 +1,39 @@
+using Microsoft.AspNetCore.Identity;
+using Gymify.Domain.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Gymify.Infrastructure.Data.Identity.Entities
+{
+    public class ApplicationUser : IdentityUser<int>
+    {
+
+
+        public ApplicationUser(string email, string? phoneNumber = default)
+        {
+            UserName = email;
+            Email = email;
+            PhoneNumber = phoneNumber;
+        }
+
+        public int? DomainUserId { get; private set; }
+
+        [ForeignKey(nameof(DomainUserId))]
+        public virtual DomainUser? DomainUser { get; private set; }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new HashSet<RefreshToken>();
+
+
+        public void LinkToDomainUser(DomainUser domainUser)
+        {
+            if (domainUser is null)
+                throw new ArgumentNullException("Domain user can't be null");
+
+            if (DomainUserId is not null)
+                throw new ArgumentNullException("This app user is associated with domain user");
+
+            DomainUser = domainUser;
+            DomainUserId = domainUser.Id;
+        }
+
+
+    }
+}

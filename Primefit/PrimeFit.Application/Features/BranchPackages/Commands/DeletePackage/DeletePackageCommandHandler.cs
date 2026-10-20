@@ -1,0 +1,38 @@
+using PrimeFit.Application.Security.Contracts;
+using PrimeFit.Application.Specifications.BranchPackages;
+using PrimeFit.Domain.Common.Constants;
+using PrimeFit.Domain.Common.Enums;
+using PrimeFit.Domain.RepositoriesContracts;
+
+namespace PrimeFit.Application.Features.BranchPackages.Commands.DeletePackage
+{
+    public class DeletePackageCommandHandler : ICommandHandler<DeletePackageCommand, Deleted>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public DeletePackageCommandHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<ErrorOr<Deleted>> Handle(DeletePackageCommand request, CancellationToken cancellationToken)
+        {
+
+            var spec = new PackageWithBrnachByIdSpec(request.PackageId, request.BranchId);
+            var package = await _unitOfWork.Packages.FirstOrDefaultAsync(spec, cancellationToken);
+
+            if (package is null)
+            {
+                return Error.NotFound(
+                    ErrorCodes.Branch.PackageNotFound,
+                    "Package not found");
+            }
+
+            package.Delete();
+            await _unitOfWork.Packages.DeleteAsync(package, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Result.Deleted;
+        }
+    }
+}

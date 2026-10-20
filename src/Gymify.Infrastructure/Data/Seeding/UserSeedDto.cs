@@ -14,6 +14,8 @@ namespace Gymify.Infrastructure.Data.Seeding
         public ApprovalStatus? ApprovalStatus { get; set; }
         public double? Height { get; set; }
         public double? Weight { get; set; }
+        public decimal? Salary { get; set; }
+        public int? YearsOfExperience { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

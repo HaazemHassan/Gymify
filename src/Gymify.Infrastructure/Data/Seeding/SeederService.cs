@@ -128,8 +128,18 @@ namespace Gymify.Infrastructure.Data.Seeding
 
                     var normalizedPhone = _phoneNumberService.Normalize(userData.PhoneNumber);
 
+                    var userType = userData.UserType != UserType.Unknown
+                        ? userData.UserType
+                        : userData.Role switch
+                        {
+                            UserRole.SuperAdmin => UserType.SuperAdmin,
+                            UserRole.Customer => UserType.Customer,
+                            UserRole.Trainer or UserRole.Manager or UserRole.Gator => UserType.Employee,
+                            _ => UserType.Customer
+                        };
+
                     var domainUser = new DomainUser(
-                        userData.UserType,
+                        userType,
                         userData.Name,
                         userData.Email,
                         normalizedPhone,
@@ -143,7 +153,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         throw new Exception($"Failed to create user {userData.Email}: {result.FirstError.Description}");
                     }
 
-                    if (userData.UserType == UserType.Customer || userData.Role == UserRole.Customer)
+                    if (userType == UserType.Customer || userData.Role == UserRole.Customer)
                     {
                         var customer = new Customer(
                             domainUser.Id,
@@ -153,6 +163,27 @@ namespace Gymify.Infrastructure.Data.Seeding
 
                         await _unitOfWork.Customers.AddAsync(customer, cancellationToken);
                         await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    }
+                    else if (userType == UserType.Employee || userData.Role is UserRole.Trainer or UserRole.Manager or UserRole.Gator)
+                    {
+                        var employee = new Employee(
+                            domainUserId: domainUser.Id,
+                            salary: userData.Salary ?? 0m,
+                            isActive: true);
+
+                        await _unitOfWork.Employees.AddAsync(employee, cancellationToken);
+                        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                        if (userData.Role == UserRole.Trainer)
+                        {
+                            var trainer = new Trainer(
+                                employeeId: employee.Id,
+                                yearsOfExperience: userData.YearsOfExperience ?? 0,
+                                isActive: true);
+
+                            await _unitOfWork.Trainers.AddAsync(trainer, cancellationToken);
+                            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                        }
                     }
 
                     var createdUser = await _userManager.FindByEmailAsync(userData.Email);
@@ -169,9 +200,11 @@ namespace Gymify.Infrastructure.Data.Seeding
 
                 await transaction.CommitAsync(cancellationToken);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to seed users: {Message}", ex.Message);
                 await transaction.RollbackAsync(cancellationToken);
+                throw;
             }
         }
     }

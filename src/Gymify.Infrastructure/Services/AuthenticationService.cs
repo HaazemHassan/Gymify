@@ -30,7 +30,7 @@ namespace Gymify.Infrastructure.Services
 
 
 
-        public async Task<ErrorOr<AuthResult>> SignInWithPasswordAsync(string email, string password, UserType requestedUserType, CancellationToken ct = default)
+        public async Task<ErrorOr<AuthResult>> SignInWithPasswordAsync(string email, string password, CancellationToken ct = default)
         {
             var userFromDb = await userManager.Users
                                 .Include(au => au.DomainUser!)
@@ -40,12 +40,6 @@ namespace Gymify.Infrastructure.Services
             {
                 logger.LogWarning("Failed login attempt for email: {Email} - User not found", email);
                 return Error.Unauthorized(code: ErrorCodes.Authentication.InvalidCredentials, description: "Invalid Email or password");
-            }
-
-            if (userFromDb.DomainUser.UserType != requestedUserType)
-            {
-                logger.LogWarning("Failed login attempt for email: {Email} - Invalid UserType {RequestedUserType} vs {ActualUserType}", email, requestedUserType, userFromDb.DomainUser.UserType);
-                return Error.Validation(code: ErrorCodes.Authorization.InvalidUserType, description: "Invalid email or password.");
             }
 
             bool isAuthenticated = await userManager.CheckPasswordAsync(userFromDb, password);

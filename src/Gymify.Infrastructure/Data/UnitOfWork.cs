@@ -9,6 +9,7 @@ internal sealed class UnitOfWork(
     AppDbContext context,
     IUserRepository users,
     ICustomerRepository customers,
+    IEmployeeRepository employees,
     IPackageRepository packages,
     ITrainerRepository trainers,
     ILockerRepository lockers,
@@ -22,6 +23,7 @@ internal sealed class UnitOfWork(
 
     public IUserRepository Users { get; } = users;
     public ICustomerRepository Customers { get; } = customers;
+    public IEmployeeRepository Employees { get; } = employees;
     public IPackageRepository Packages { get; } = packages;
     public ITrainerRepository Trainers { get; } = trainers;
     public ILockerRepository Lockers { get; } = lockers;

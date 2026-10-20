@@ -7,6 +7,7 @@ public interface IUnitOfWork
 
     IUserRepository Users { get; }
     ICustomerRepository Customers { get; }
+    IEmployeeRepository Employees { get; }
     IPackageRepository Packages { get; }
     ITrainerRepository Trainers { get; }
     ILockerRepository Lockers { get; }

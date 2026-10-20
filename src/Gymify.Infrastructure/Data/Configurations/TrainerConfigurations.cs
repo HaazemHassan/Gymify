@@ -17,6 +17,10 @@ namespace Gymify.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasDefaultValue(0);
 
+            builder.Property(t => t.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
             builder.HasOne(t => t.Employee)
                 .WithOne(e => e.Trainer)
                 .HasForeignKey<Trainer>(t => t.EmployeeId)

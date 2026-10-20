@@ -38,8 +38,15 @@ namespace Gymify.API.Extentions
                 {
                     var seederService = scope.ServiceProvider.GetRequiredService<ISeederService>();
 
-                    string rolesJson = await File.ReadAllTextAsync("DataSeedingJson/SystemRoles.json");
-                    string usersJson = await File.ReadAllTextAsync("DataSeedingJson/Users.json");
+                    string contentRoot = app.Environment.ContentRootPath;
+                    string rolesPath = Path.Combine(contentRoot, "DataSeedingJson", "SystemRoles.json");
+                    if (!File.Exists(rolesPath)) rolesPath = "DataSeedingJson/SystemRoles.json";
+
+                    string usersPath = Path.Combine(contentRoot, "DataSeedingJson", "Users.json");
+                    if (!File.Exists(usersPath)) usersPath = "DataSeedingJson/Users.json";
+
+                    string rolesJson = await File.ReadAllTextAsync(rolesPath);
+                    string usersJson = await File.ReadAllTextAsync(usersPath);
 
                     List<RoleSeedDto>? rolesSeedData = JsonSerializer.Deserialize<List<RoleSeedDto>>(rolesJson);
 

@@ -5,7 +5,8 @@
     "PhoneNumber": "01000000000",
     "Address": "Cairo, Egypt",
     "Password": "12345678Hh",
-    "Role": "SuperAdmin"
+    "Role": "SuperAdmin",
+    "UserType": "SuperAdmin"
   },
   {
     "Name": "Trainer Ahmed",
@@ -13,7 +14,10 @@
     "PhoneNumber": "01234567893",
     "Address": "Cairo, Egypt",
     "Password": "12345678Hh",
-    "Role": "Trainer"
+    "Role": "Trainer",
+    "UserType": "Employee",
+    "Salary": 6000,
+    "YearsOfExperience": 3
   },
   {
     "Name": "Manager Sara",
@@ -21,7 +25,9 @@
     "PhoneNumber": "01234567894",
     "Address": "Cairo, Egypt",
     "Password": "12345678Hh",
-    "Role": "Manager"
+    "Role": "Manager",
+    "UserType": "Employee",
+    "Salary": 10000
   },
   {
     "Name": "Gator Mohamed",
@@ -29,7 +35,9 @@
     "PhoneNumber": "01234567895",
     "Address": "Cairo, Egypt",
     "Password": "12345678Hh",
-    "Role": "Gator"
+    "Role": "Gator",
+    "UserType": "Employee",
+    "Salary": 4000
   },
   {
     "Name": "Customer User",
@@ -38,6 +46,7 @@
     "Address": "Giza, Egypt",
     "Password": "12345678Hh",
     "Role": "Customer",
+    "UserType": "Customer",
     "ApprovalStatus": "Approved",
     "IsActive": true
   }

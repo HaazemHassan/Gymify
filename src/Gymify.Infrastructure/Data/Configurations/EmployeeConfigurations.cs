@@ -16,6 +16,10 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(e => e.Salary)
                 .HasPrecision(18, 2);
 
+            builder.Property(e => e.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
             builder.HasOne(e => e.DomainUser)
                 .WithOne(u => u.Employee)
                 .HasForeignKey<Employee>(e => e.DomainUserId)

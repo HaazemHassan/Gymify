@@ -83,6 +83,12 @@ To prevent cargo-culting and inappropriate code bloat, all practices are categor
     - Route names in `RouteNames.cs` and `[HttpGet(..., Name = ...)]` are reserved **strictly** for endpoints that need to be referenced by name in HTTP responses — specifically `GetById` endpoints referenced by `CreatedAtRoute` in entity creation endpoints (e.g., `RouteNames.Packages.GetPackageByIdForManagement`, `RouteNames.Users.GetUserById`).
     - Standard query endpoints (such as paginated list queries, search queries, status checks, current occupancy, etc.) and mutation endpoints must **never** have route names assigned to them.
     - If a creation action does not have a dedicated `GetById` endpoint to return a URL for, return `Ok(result.Value)` or `StatusCode(StatusCodes.Status201Created, result.Value)` instead of linking to an unrelated list query or inventing superfluous route names.
+17. **Explicit Composite Entity & User IDs in Customer and Staff DTOs**:
+    - **Never return only a single ambiguous `Id`** when returning Customer, Trainer, or Employee responses.
+    - **For Customers**: Always return both `CustomerId` and `UserId` (along with `Id` = `CustomerId` for backward compatibility).
+    - **For Trainers**: Always return `TrainerId`, `EmployeeId`, and `UserId` (along with `Id` = `TrainerId`).
+    - **For Other Staff/Employees**: Always return `EmployeeId` and `UserId` (along with `Id` = `EmployeeId` or specific role ID).
+    - Frontend clients and consumer services routinely need to correlate the underlying authentication/domain user account with the specific profile entity (Customer, Employee, Trainer) for subscriptions, attendances, payroll, and scheduling. Returning all relevant IDs avoids multiple redundant roundtrips.
 
 ### Level B: Established Implementation Conventions (Follow When Applicable)
 1. **CQRS Segregation**: Separate operations into `Commands` (state-modifying) and `Queries` (read-only) under feature-specific directories.

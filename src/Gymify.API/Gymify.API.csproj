@@ -32,4 +32,10 @@
     <Folder Include="Common\Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="DataSeedingJson\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

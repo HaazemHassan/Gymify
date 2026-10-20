@@ -4,7 +4,7 @@ using Gymify.Domain.RepositoriesContracts;
 
 namespace Gymify.Application.Features.Authentication.Commands.SignIn;
 
-public class SignInCommandHandler(
+public class SignInWithPasswordCommandHandler(
     IAuthenticationService _authenticationService,
     IApplicationUserService _applicationUserService,
     IUnitOfWork _unitOfWork)
@@ -12,7 +12,7 @@ public class SignInCommandHandler(
 {
     public async Task<ErrorOr<AuthResponse>> Handle(SignInWithPasswordCommand request, CancellationToken cancellationToken)
     {
-        var authResult = await _authenticationService.SignInWithPasswordAsync(request.Email, request.Password, request.UserType, cancellationToken);
+        var authResult = await _authenticationService.SignInWithPasswordAsync(request.Email, request.Password, cancellationToken);
         if (authResult.IsError)
         {
             return authResult.Errors;

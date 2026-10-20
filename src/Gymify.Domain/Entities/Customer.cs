@@ -1,3 +1,4 @@
+using ErrorOr;
 using Gymify.Domain.Common.Enums;
 using Gymify.Domain.Entities.Base;
 
@@ -65,9 +66,35 @@ namespace Gymify.Domain.Entities
             if (notes is not null) Notes = notes;
         }
 
-        public void UpdateApprovalStatus(ApprovalStatus status)
+        public ErrorOr<Success> UpdateApprovalStatus(ApprovalStatus newStatus)
         {
-            ApprovalStatus = status;
+
+            ApprovalStatus = newStatus;
+            return Result.Success;
+        }
+
+        public void UpdateDetails(
+            double? height = null,
+            double? weight = null,
+            string? code = null,
+            int? age = null,
+            string? injuries = null,
+            string? chronicDiseases = null,
+            double? musclePercentage = null,
+            double? fatPercentage = null,
+            string? notes = null,
+            ApprovalStatus? approvalStatus = null)
+        {
+            if (height.HasValue) Height = height.Value;
+            if (weight.HasValue) Weight = weight.Value;
+            if (code is not null) Code = code;
+            if (age.HasValue) Age = age.Value;
+            if (injuries is not null) Injuries = injuries;
+            if (chronicDiseases is not null) ChronicDiseases = chronicDiseases;
+            if (musclePercentage.HasValue) MusclePercentage = musclePercentage.Value;
+            if (fatPercentage.HasValue) FatPercentage = fatPercentage.Value;
+            if (notes is not null) Notes = notes;
+            if (approvalStatus.HasValue) ApprovalStatus = approvalStatus.Value;
         }
     }
 }

@@ -1,15 +1,13 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Gymify.API.Requests.Attendances.CheckIn;
 using Gymify.API.Requests.Attendances.CheckOut;
 using Gymify.Application.Features.Attendances.Commands.CheckIn;
 using Gymify.Application.Features.Attendances.Commands.CheckOut;
 using Gymify.Application.Features.Attendances.Queries.GetCurrentGymOccupancy;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
 {
-    [Authorize]
     public class AttendancesController : BaseController
     {
         private readonly IMapper _mapper;

@@ -9,6 +9,10 @@ tmp/
 app/**/*.js
 app/**/*.js.map
 
+# publish folders
+publish/
+test_publish/
+
 # dependencies
 node_modules/
 bower_components/

@@ -5,7 +5,8 @@ namespace Gymify.Application.Features.Customers.Queries.GetCustomerMe
     public class GetCustomerMeQueryResponse
     {
         public int Id { get; set; }
-        public int DomainUserId { get; set; }
+        public int UserId { get; set; }
+        public int CustomerId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }

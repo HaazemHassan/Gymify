@@ -46,7 +46,7 @@ Before writing or modifying any code, recognize the tier of each standard:
 
 | Classification | Meaning | Examples |
 | :--- | :--- | :--- |
-| **Mandatory Rules** | **Never violate.** Core architectural constraints. | Dependency direction, encapsulated entity setters, returning `ErrorOr<T>` instead of business exceptions, using AutoMapper `ProjectTo` for query projections, controllers inheriting `BaseController`, strict CQRS naming alignment (`{RequestName}Response`, etc.), declaring response models as `class` (never `record`), mandatory pagination for all list/collection queries (`PaginatedQuery` returning `PaginatedResult<T>`), single source of truth for validation rules (`{Entity}ValidationRules` in `Shared/`), and query/command-specific specifications colocated in `Specifications/` subfolders. |
+| **Mandatory Rules** | **Never violate.** Core architectural constraints. | Dependency direction, encapsulated entity setters, returning `ErrorOr<T>` instead of business exceptions, domain mutation methods returning `ErrorOr<Success>` with domain validations, mandatory use of `IDateTimeProvider` via DI (never direct `DateTime.UtcNow`/`DateTime.Now`), mandatory use of `DateTimeOffset` over `DateTime` for all timestamps, strict prohibition of hardcoded error strings (always define in and reference from `ErrorCodes.{Domain}`), using AutoMapper `ProjectTo` for query projections, controllers inheriting `BaseController`, strict CQRS naming alignment (`{RequestName}Response`, etc.), declaring response models as `class` (never `record`), mandatory pagination for all list/collection queries (`PaginatedQuery` returning `PaginatedResult<T>`), single source of truth for validation rules (`{Entity}ValidationRules` in `Shared/`), query/command-specific specifications colocated in `Specifications/` subfolders, and restricted use of `RouteNames.cs` strictly for `GetById` endpoints referenced by `CreatedAtRoute`. |
 | **Established Conventions** | **Standard practice.** Follow when applicable. | CQRS separation into `Commands/` and `Queries/`, colocated `AbstractValidator<T>` calling `ApplyValidationRules()`, feature-level `Specifications/` folder exclusively for common specifications shared across multiple queries/commands. |
 | **Optional Components** | **Introduce only when required.** Do not force into every feature. | `ICachePolicy<T>` (only for high-read queries), `ICacheInvalidationPolicy<T>` (only for commands invalidating caches), `IDomainEvent` (only for cross-aggregate side effects). |
 | **Feature-Specific Decisions** | **Context-dependent.** Do not blindly replicate. | Custom authorization attributes (e.g. legacy `[BranchAuthorize]`), specific multi-tenant filters, or domain services spanning multiple aggregates. |
@@ -181,16 +181,28 @@ For step-by-step instructions on each layer, see [workflows.md](file:///d:/new%2
        }
    }
    ```
-4. **Handler**:
+5. **Handler** (Injects `IDateTimeProvider` for timestamps; checks domain mutation `ErrorOr` result):
    ```csharp
    public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, CreateItemCommandResponse>
    {
        private readonly IUnitOfWork _unitOfWork;
-       public CreateItemCommandHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+       private readonly IDateTimeProvider _dateTimeProvider;
+
+       public CreateItemCommandHandler(IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider)
+       {
+           _unitOfWork = unitOfWork;
+           _dateTimeProvider = dateTimeProvider;
+       }
 
        public async Task<ErrorOr<CreateItemCommandResponse>> Handle(CreateItemCommand request, CancellationToken ct)
        {
            var entity = new MyEntity(request.Name);
+           
+           // If performing domain mutation, verify ErrorOr<Success> result
+           var updateResult = entity.UpdateStatus(_dateTimeProvider.UtcNow.UtcDateTime);
+           if (updateResult.IsError)
+               return updateResult.Errors;
+
            await _unitOfWork.MyEntities.AddAsync(entity, ct);
            await _unitOfWork.SaveChangesAsync(ct);
            return new CreateItemCommandResponse(entity.Id);
@@ -357,7 +369,8 @@ dotnet build Gymify.sln
 - [ ] Domain entities have `private set;` on all business properties.
 - [ ] Handlers return `ErrorOr<T>` with standard `ErrorCodes`.
 - [ ] No `DbContext` directly injected in `Gymify.Application`.
-- [ ] Controller action returns `Problem(result.Errors)` or `Ok(result.Value)`.
+- [ ] Controller action returns `Problem(result.Errors)` or `Ok(result.Value)` (or `CreatedAtRoute` referencing a named `GetById` endpoint).
+- [ ] No superfluous route names defined in `RouteNames.cs` (reserved strictly for `GetById` routes used in `CreatedAtRoute`).
 - [ ] `_unitOfWork.SaveChangesAsync` is called exactly once per command handler.
 
 ---

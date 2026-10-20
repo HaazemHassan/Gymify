@@ -15,8 +15,10 @@ namespace Gymify.Domain.Entities
             string packageName,
             decimal packagePrice,
             int packageDuration,
-            string? packageDescription,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
             PaymentMethod paymentMethod,
+            string? packageDescription = null,
             string? notes = null)
         {
             CustomerId = customerId;
@@ -24,8 +26,10 @@ namespace Gymify.Domain.Entities
             PackageName = packageName;
             PackagePrice = packagePrice;
             PackageDuration = packageDuration;
-            PackageDescription = packageDescription;
+            StartDate = startDate;
+            EndDate = endDate;
             PaymentMethod = paymentMethod;
+            PackageDescription = packageDescription;
             Notes = notes;
         }
 
@@ -41,7 +45,12 @@ namespace Gymify.Domain.Entities
         public int PackageDuration { get; private set; }
         public string? PackageDescription { get; private set; }
 
+        public DateTimeOffset StartDate { get; private set; }
+        public DateTimeOffset EndDate { get; private set; }
+
         public PaymentMethod PaymentMethod { get; private set; }
         public string? Notes { get; private set; }
+
+        public bool IsActive(DateTimeOffset now) => StartDate <= now && EndDate >= now;
     }
 }

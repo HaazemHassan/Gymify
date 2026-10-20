@@ -16,6 +16,10 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(c => c.Code)
                 .HasMaxLength(50);
 
+            builder.HasIndex(c => c.Code)
+                .IsUnique()
+                .HasFilter("[Code] IS NOT NULL AND [IsDeleted] = 0");
+
             builder.Property(c => c.Injuries)
                 .HasMaxLength(1000);
 

@@ -36,6 +36,7 @@ namespace Gymify.Domain.Entities
         public ApprovalStatus ApprovalStatus { get; private set; } = ApprovalStatus.Pending;
 
         public ICollection<Subscription> Subscriptions { get; private set; } = new List<Subscription>();
+        public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
 
         public void UpdatePhysicalAttributes(double? height, double? weight)
         {

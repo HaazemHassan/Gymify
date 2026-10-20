@@ -18,6 +18,8 @@ namespace Gymify.Infrastructure.Data
         public DbSet<Subscription> Subscriptions => Set<Subscription>();
         public DbSet<Employee> Employees => Set<Employee>();
         public DbSet<Trainer> Trainers => Set<Trainer>();
+        public DbSet<Locker> Lockers => Set<Locker>();
+        public DbSet<Attendance> Attendances => Set<Attendance>();
         public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

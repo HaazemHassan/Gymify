@@ -451,3 +451,10 @@ public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest r
     return Ok(result.Value);
 }
 ```
+
+### Route Names & `CreatedAtRoute` Conventions
+- **Do NOT declare route names for every endpoint**: Route names should not be added indiscriminately to `RouteNames.cs` or `[HttpGet(Name = ...)]`.
+- **Only define route names for `CreatedAtRoute` targets**: Typically only `GetById` endpoints (e.g. `RouteNames.Packages.GetPackageByIdForManagement`, `RouteNames.Users.GetUserById`) that are needed when returning HTTP 201 Created from a creation endpoint.
+- Standard queries (list queries, paginated searches, real-time counters, status checks) and update/delete mutations must remain unnamed (`[HttpGet]`, `[HttpGet("path")]`, `[HttpPost]`).
+- If an entity creation endpoint does not have a dedicated `GetById` endpoint, return `Ok(result.Value)` or `StatusCode(StatusCodes.Status201Created, result.Value)` rather than linking to an unrelated list query.
+

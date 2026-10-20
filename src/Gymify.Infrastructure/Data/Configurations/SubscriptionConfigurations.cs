@@ -33,12 +33,20 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(s => s.PackageDescription)
                 .HasMaxLength(1000);
 
+            builder.Property(s => s.StartDate)
+                .IsRequired();
+
+            builder.Property(s => s.EndDate)
+                .IsRequired();
+
             builder.Property(s => s.PaymentMethod)
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
             builder.Property(s => s.Notes)
                 .HasMaxLength(2000);
+
+            builder.HasIndex(s => new { s.CustomerId, s.EndDate });
         }
     }
 }

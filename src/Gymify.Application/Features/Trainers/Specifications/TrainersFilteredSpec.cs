@@ -1,0 +1,22 @@
+using Ardalis.Specification;
+using Gymify.Domain.Entities;
+
+namespace Gymify.Application.Features.Trainers.Specifications
+{
+    public class TrainersFilteredSpec : Specification<Trainer>
+    {
+        public TrainersFilteredSpec(string? search, bool isActive = true)
+        {
+            if (isActive)
+            {
+                Query.Where(t => t.Employee.DomainUser.IsActive);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var trimmed = search.Trim();
+                Query.Where(t => t.Employee.DomainUser.Name.Contains(trimmed));
+            }
+        }
+    }
+}

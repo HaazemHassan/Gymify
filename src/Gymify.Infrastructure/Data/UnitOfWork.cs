@@ -10,6 +10,10 @@ internal sealed class UnitOfWork(
     IUserRepository users,
     ICustomerRepository customers,
     IPackageRepository packages,
+    ITrainerRepository trainers,
+    ILockerRepository lockers,
+    IAttendanceRepository attendances,
+    ISubscriptionRepository subscriptions,
     IRefreshTokenRepository refreshTokens,
     IVerificationCodeRepository verificationCodes)
     : IUnitOfWork
@@ -19,6 +23,10 @@ internal sealed class UnitOfWork(
     public IUserRepository Users { get; } = users;
     public ICustomerRepository Customers { get; } = customers;
     public IPackageRepository Packages { get; } = packages;
+    public ITrainerRepository Trainers { get; } = trainers;
+    public ILockerRepository Lockers { get; } = lockers;
+    public IAttendanceRepository Attendances { get; } = attendances;
+    public ISubscriptionRepository Subscriptions { get; } = subscriptions;
     public IRefreshTokenRepository RefreshTokens { get; } = refreshTokens;
     public IVerificationCodeRepository VerificationCodes { get; } = verificationCodes;
 

@@ -13,6 +13,10 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.HasIndex(t => t.EmployeeId)
                 .IsUnique();
 
+            builder.Property(t => t.YearsOfExperience)
+                .IsRequired()
+                .HasDefaultValue(0);
+
             builder.HasOne(t => t.Employee)
                 .WithOne(e => e.Trainer)
                 .HasForeignKey<Trainer>(t => t.EmployeeId)

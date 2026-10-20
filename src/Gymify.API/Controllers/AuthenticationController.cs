@@ -1,7 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Gymify.Api.Requests.Authentication.ChangePassword;
 using Gymify.Api.Requests.Authentication.ConfirmEmail;
 using Gymify.Api.Requests.Authentication.Logout;
@@ -28,6 +25,9 @@ using Gymify.Application.Features.Authentication.Commands.SignIn;
 using Gymify.Application.Features.Authentication.Commands.SignInWithGoogle;
 using Gymify.Application.Features.Authentication.Common;
 using Gymify.Application.Features.Authentication.Queries.ValidateResetPasswordCode;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Gymify.API.Controllers
 {
@@ -93,6 +93,10 @@ namespace Gymify.API.Controllers
             return Ok(result.Value);
         }
 
+
+
+
+
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
@@ -115,6 +119,11 @@ namespace Gymify.API.Controllers
             return Ok(result.Value);
         }
 
+
+
+
+
+
         [HttpPost("confirm-email")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
@@ -129,6 +138,10 @@ namespace Gymify.API.Controllers
 
             return NoContent();
         }
+
+
+
+
 
         [HttpPost("validate-reset-password-code")]
         [AllowAnonymous]
@@ -161,6 +174,9 @@ namespace Gymify.API.Controllers
             return NoContent();
         }
 
+
+
+
         [HttpPost("send-reset-password-email")]
         [AnonymousOnly]
         public async Task<IActionResult> SendResetPasswordEmail([FromBody] SendResetPasswordEmailRequest request)
@@ -174,6 +190,10 @@ namespace Gymify.API.Controllers
 
             return NoContent();
         }
+
+
+
+
 
         [HttpPost("reset-password")]
         [AnonymousOnly]
@@ -189,6 +209,8 @@ namespace Gymify.API.Controllers
             return NoContent();
         }
 
+
+
         [HttpPost("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
@@ -203,6 +225,9 @@ namespace Gymify.API.Controllers
 
             return NoContent();
         }
+
+
+
 
         [HttpPost("logout")]
         [Authorize]

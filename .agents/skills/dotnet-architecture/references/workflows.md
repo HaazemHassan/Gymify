@@ -22,7 +22,7 @@ Before making any changes:
    - Add private parameterless constructor for EF Core.
    - Add explicit parameterized constructor or static `Create(...)` method returning `ErrorOr<{Entity}>`.
    - Encapsulate fields with `private set;`.
-   - Add explicit mutation methods.
+   - Add explicit mutation methods returning `ErrorOr<Success>` (never `void`) with domain validation of business invariants.
 2. Define repository contract in `Gymify.Domain/RepositoriesContracts/I{Entity}Repository.cs`:
    - Inherit `IGenericRepository<{Entity}>`.
 3. Add repository property to `Gymify.Domain/RepositoriesContracts/IUnitOfWork.cs`.
@@ -45,7 +45,7 @@ Create feature folder under `Gymify.Application/Features/{Entity}s/`:
    - `{ActionName}Command.cs`: Implement `ICommand<{ActionName}CommandResponse>` or `ICommand`. Add `[Authorize]` / `IAuthorizedRequest` / `IOwnedResourceRequest` if protected.
    - `{ActionName}CommandResponse.cs`: Define the returned DTO class.
    - `{ActionName}CommandValidator.cs`: Inherit `AbstractValidator<{ActionName}Command>`, define rules inside `ApplyValidationRules()` referencing `{Entity}ValidationRules` and `CommonValidationRules`.
-   - `{ActionName}CommandHandler.cs`: Implement `ICommandHandler<{ActionName}Command, {ActionName}CommandResponse>`. Inject `IUnitOfWork`, `IMapper`, domain services. Execute business logic, call `await _unitOfWork.SaveChangesAsync(ct)`, return `ErrorOr` result.
+   - `{ActionName}CommandHandler.cs`: Implement `ICommandHandler<{ActionName}Command, {ActionName}CommandResponse>`. Inject `IUnitOfWork`, `IDateTimeProvider` (never use `DateTime.UtcNow` / `DateTime.Now` directly), and services. Execute business logic, check `ErrorOr<Success>` results of domain mutations, call `await _unitOfWork.SaveChangesAsync(ct)`, return `ErrorOr` result.
    - *(Optional)* `Specifications/{SpecName}.cs`: If command requires a dedicated query specification, colocate it inside a `Specifications/` subfolder.
    - *(Optional)* `{ActionName}CommandCacheInvalidationPolicy.cs`: Implement `ICacheInvalidationPolicy<{ActionName}Command>` if altering cached tags.
 

@@ -8,6 +8,10 @@ public interface IUnitOfWork
     IUserRepository Users { get; }
     ICustomerRepository Customers { get; }
     IPackageRepository Packages { get; }
+    ITrainerRepository Trainers { get; }
+    ILockerRepository Lockers { get; }
+    IAttendanceRepository Attendances { get; }
+    ISubscriptionRepository Subscriptions { get; }
     IRefreshTokenRepository RefreshTokens { get; }
     IVerificationCodeRepository VerificationCodes { get; }
 

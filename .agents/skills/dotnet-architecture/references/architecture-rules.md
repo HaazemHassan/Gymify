@@ -65,6 +65,24 @@ To prevent cargo-culting and inappropriate code bloat, all practices are categor
     - **Query/Command-Specific Specs**: Must be placed in a `Specifications/` subfolder *inside* that specific query or command directory (e.g., `Features/{Entity}s/Queries/{QueryName}/Specifications/{SpecName}.cs`).
     - **Feature-Common Specs**: Only specifications shared across multiple queries or commands within the feature belong in `Features/{Entity}s/Specifications/{CommonSpecName}.cs`.
     - **Global Shared Specs**: Generic specifications across aggregates belong in `Gymify.Application/Specifications/Shared/` (e.g., `GetByIdSpec<T>`).
+12. **Mandatory Use of `IDateTimeProvider` via Dependency Injection**:
+    - **Never** use `DateTime.UtcNow`, `DateTime.Now`, `DateTimeOffset.UtcNow`, or `DateTimeOffset.Now` directly in command handlers, query handlers, or domain orchestration services.
+    - **Always** inject `IDateTimeProvider` (from `Gymify.Application.ServicesContracts.Infrastructure`) via constructor and retrieve timestamps through `_dateTimeProvider.UtcNow`. This ensures absolute testability, clock consistency, and predictable timezone conversion.
+13. **Domain Mutation Methods Must Return `ErrorOr<Success>` with Domain Validation**:
+    - Entity methods that mutate state or transition lifecycles must **never** return `void`.
+    - They must return `ErrorOr<Success>` (or `ErrorOr<T>`) and encapsulate domain business invariants (e.g., checking lifecycle prerequisites, verifying logical time order, preventing invalid re-execution).
+    - Handlers invoking these methods must check `if (result.IsError) return result.Errors;` before calling `SaveChangesAsync`. This keeps business logic and validation rich within the Domain layer rather than leaking into application handlers.
+14. **Mandatory Use of `DateTimeOffset` Over `DateTime`**:
+    - **Always** declare timestamps, dates, expiration times, and event occurrence properties using `DateTimeOffset` (and `DateTimeOffset?`), **never** raw `DateTime`.
+    - `DateTimeOffset` eliminates timezone and daylight saving ambiguities, guarantees UTC offset awareness, and matches `IDateTimeProvider.UtcNow` and EF Core `datetimeoffset` column types directly.
+15. **Strict Prohibition of Hardcoded Error Code Strings**:
+    - **Never** use hardcoded string literals when constructing `Error` objects (e.g. `Error.Conflict("Locker.AlreadyActive", ...)` is strictly prohibited).
+    - **Always** declare error code constants as `public const string` inside `Gymify.Domain.Common.Constants.ErrorCodes` grouped by aggregate/feature class (e.g. `ErrorCodes.Locker.AlreadyActive`), and reference them universally across entities, handlers, and tests.
+16. **Restricted Use of Route Names (`RouteNames.cs`)**:
+    - **Do NOT add constants in `RouteNames.cs` for every endpoint indiscriminately**.
+    - Route names in `RouteNames.cs` and `[HttpGet(..., Name = ...)]` are reserved **strictly** for endpoints that need to be referenced by name in HTTP responses — specifically `GetById` endpoints referenced by `CreatedAtRoute` in entity creation endpoints (e.g., `RouteNames.Packages.GetPackageByIdForManagement`, `RouteNames.Users.GetUserById`).
+    - Standard query endpoints (such as paginated list queries, search queries, status checks, current occupancy, etc.) and mutation endpoints must **never** have route names assigned to them.
+    - If a creation action does not have a dedicated `GetById` endpoint to return a URL for, return `Ok(result.Value)` or `StatusCode(StatusCodes.Status201Created, result.Value)` instead of linking to an unrelated list query or inventing superfluous route names.
 
 ### Level B: Established Implementation Conventions (Follow When Applicable)
 1. **CQRS Segregation**: Separate operations into `Commands` (state-modifying) and `Queries` (read-only) under feature-specific directories.
@@ -99,3 +117,8 @@ To prevent cargo-culting and inappropriate code bloat, all practices are categor
 | **Logic in Controllers** | Breaks testability and violates single responsibility. | Controllers only bind requests, invoke `Mediator.Send(...)`, and map result to `ActionResult`. |
 | **Calling SaveChangesAsync Multiple Times** | Destroys transaction atomicity and increases latency. | Call `await _unitOfWork.SaveChangesAsync(ct)` once per command handler. |
 | **Bypassing UnitOfWork** | Creates untracked contexts and inconsistency. | Always inject `IUnitOfWork` into handlers. |
+| **Direct `DateTime.UtcNow` / `DateTime.Now` Usage** | Destroys testability, leads to flaky time-dependent tests, and prevents uniform time-zone control. | Inject `IDateTimeProvider` via constructor and use `_dateTimeProvider.UtcNow`. |
+| **Void Domain Mutation Methods Lacking Validation** (`public void CheckOut(...)`) | Bypasses domain invariant validation and allows entities to enter corrupt or contradictory states silently. | Return `ErrorOr<Success>` from domain methods, validate business prerequisites, and verify `result.IsError` in calling handlers. |
+| **Using `DateTime` Instead of `DateTimeOffset`** | Introduces timezone ambiguity, corrupts local-vs-UTC conversions, and leads to inconsistent timestamps. | Use `DateTimeOffset` (and `DateTimeOffset?`) for all date and time properties across entities and DTOs. |
+| **Hardcoding Error Codes as Strings** (`Error.Conflict("Locker.AlreadyActive", ...)`) | Destroys type safety, causes drift between client and server, and breaks centralized error cataloging. | Define all error codes as `public const string` in `ErrorCodes.cs` under the domain class and reference `ErrorCodes.{Domain}.{Constant}`. |
+| **Indiscriminate Route Names for All Endpoints** (`RouteNames.Lockers.GetLockers`, `[HttpGet(Name = ...)]`) | Pollutes `RouteNames.cs`, creates useless coupling, and breaks REST conventions. | Only define route names in `RouteNames.cs` for endpoints required by `CreatedAtRoute` (primarily `GetById`). Normal endpoints do not need route names. |

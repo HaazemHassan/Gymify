@@ -237,6 +237,7 @@ namespace Gymify.Infrastructure.Services
                 var customer = new Customer(domainUser.Id, approvalStatus: ApprovalStatus.Pending);
                 await unitOfWork.Customers.AddAsync(customer, ct);
                 await unitOfWork.SaveChangesAsync(ct);
+                await userManager.AddToRoleAsync(appUser, UserRole.Customer.ToString());
             }
 
             var loginInfo = new UserLoginInfo(googleProvider, googleUser.GoogleId, googleProvider);

@@ -80,7 +80,7 @@ namespace Gymify.API.Controllers
         /// <summary>
         /// Updates an existing locker (number and/or status). Requires LockersWrite permission.
         /// </summary>
-        [HttpPut("{id:int}")]
+        [HttpPatch("{id:int}")]
         public async Task<IActionResult> UpdateLocker(
             [FromRoute] int id,
             [FromBody] UpdateLockerRequest request,

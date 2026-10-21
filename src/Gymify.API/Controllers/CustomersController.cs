@@ -85,7 +85,7 @@ namespace Gymify.API.Controllers
         /// <summary>
         /// Updates customer details and domain user properties. All fields are nullable for partial or full updates. Requires UsersWrite permission.
         /// </summary>
-        [HttpPut("{id:int}")]
+        [HttpPatch("{id:int}")]
         [Authorize]
         [ProducesResponseType(typeof(UpdateCustomerCommandResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

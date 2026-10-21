@@ -87,10 +87,16 @@ namespace Gymify.Application.Features.Authentication.Commands.RegisterCustomer
                     normalizedPhone
                 );
 
-                var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, ct: cancellationToken);
+                var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, cancellationToken);
                 if (addUserResult.IsError)
                 {
                     return addUserResult.Errors;
+                }
+
+                var assignRoleResult = await _applicationUserService.AssignRoleAsync(addUserResult.Value, UserRole.Customer, cancellationToken);
+                if (assignRoleResult.IsError)
+                {
+                    return assignRoleResult.Errors;
                 }
             }
 

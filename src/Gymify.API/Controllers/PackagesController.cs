@@ -117,7 +117,7 @@ namespace Gymify.API.Controllers
         /// <summary>
         /// Updates an existing package. Requires PackagesWrite permission.
         /// </summary>
-        [HttpPut("{id:int}")]
+        [HttpPatch("{id:int}")]
         [Authorize]
         public async Task<IActionResult> UpdatePackage([FromRoute] int id, [FromBody] UpdatePackageRequest request, CancellationToken ct)
         {

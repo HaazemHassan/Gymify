@@ -6,6 +6,7 @@ namespace Gymify.Domain.Common.Enums
         Manager = 2,
         Gator = 3,
         SuperAdmin = 4,
-        Customer = 5
+        Customer = 5,
+        Reception = 6
     }
 }

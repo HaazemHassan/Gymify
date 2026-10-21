@@ -134,7 +134,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         {
                             UserRole.SuperAdmin => UserType.SuperAdmin,
                             UserRole.Customer => UserType.Customer,
-                            UserRole.Trainer or UserRole.Manager or UserRole.Gator => UserType.Employee,
+                            UserRole.Trainer or UserRole.Manager or UserRole.Gator or UserRole.Reception => UserType.Employee,
                             _ => UserType.Customer
                         };
 
@@ -146,11 +146,21 @@ namespace Gymify.Infrastructure.Data.Seeding
                         userData.IsActive
                     );
 
-                    var result = await _applicationUserService.AddUser(domainUser, userData.Password, userData.Role, cancellationToken);
+                    var result = await _applicationUserService.AddUser(domainUser, userData.Password, cancellationToken);
 
                     if (result.IsError)
                     {
                         throw new Exception($"Failed to create user {userData.Email}: {result.FirstError.Description}");
+                    }
+
+                    var roleToAssign = userData.Role ?? (userType == UserType.Customer ? UserRole.Customer : null);
+                    if (roleToAssign.HasValue)
+                    {
+                        var assignResult = await _applicationUserService.AssignRoleAsync(result.Value, roleToAssign.Value, cancellationToken);
+                        if (assignResult.IsError)
+                        {
+                            throw new Exception($"Failed to assign role to user {userData.Email}: {assignResult.FirstError.Description}");
+                        }
                     }
 
                     if (userType == UserType.Customer || userData.Role == UserRole.Customer)
@@ -164,7 +174,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         await _unitOfWork.Customers.AddAsync(customer, cancellationToken);
                         await _unitOfWork.SaveChangesAsync(cancellationToken);
                     }
-                    else if (userType == UserType.Employee || userData.Role is UserRole.Trainer or UserRole.Manager or UserRole.Gator)
+                    else if (userType == UserType.Employee || userData.Role is UserRole.Trainer or UserRole.Manager or UserRole.Gator or UserRole.Reception)
                     {
                         var employee = new Employee(
                             domainUserId: domainUser.Id,
@@ -192,9 +202,6 @@ namespace Gymify.Infrastructure.Data.Seeding
                     {
                         createdUser.EmailConfirmed = true;
                         await _userManager.UpdateAsync(createdUser);
-
-                        if (userData.Role is not null)
-                            await _userManager.AddToRoleAsync(createdUser, userData.Role.ToString()!);
                     }
                 }
 

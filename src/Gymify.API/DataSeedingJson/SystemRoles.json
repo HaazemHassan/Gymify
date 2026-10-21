@@ -32,5 +32,12 @@
     "Permissions": [
       "UsersRead"
     ]
+  },
+  {
+    "Name": "Reception",
+    "Permissions": [
+      "UsersRead",
+      "UsersWrite"
+    ]
   }
 ]

@@ -17,5 +17,6 @@ namespace Gymify.Application.Features.Customers.Queries.GetCustomers
         public ApprovalStatus ApprovalStatus { get; set; }
         public bool IsActive { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

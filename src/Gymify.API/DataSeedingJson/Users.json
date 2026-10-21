@@ -49,5 +49,15 @@
     "UserType": "Customer",
     "ApprovalStatus": "Approved",
     "IsActive": true
+  },
+  {
+    "Name": "Reception Sara",
+    "Email": "reception@project.com",
+    "PhoneNumber": "01234567896",
+    "Address": "Cairo, Egypt",
+    "Password": "12345678Hh",
+    "Role": "Reception",
+    "UserType": "Employee",
+    "Salary": 5000
   }
 ]

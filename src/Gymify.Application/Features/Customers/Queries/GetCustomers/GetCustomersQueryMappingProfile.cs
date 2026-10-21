@@ -20,7 +20,8 @@ namespace Gymify.Application.Features.Customers.Queries.GetCustomers
                 .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Weight))
                 .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.Age))
                 .ForMember(dest => dest.ApprovalStatus, opt => opt.MapFrom(src => src.ApprovalStatus))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
         }
     }
 }

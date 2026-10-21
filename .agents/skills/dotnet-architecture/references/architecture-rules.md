@@ -89,6 +89,12 @@ To prevent cargo-culting and inappropriate code bloat, all practices are categor
     - **For Trainers**: Always return `TrainerId`, `EmployeeId`, and `UserId` (along with `Id` = `TrainerId`).
     - **For Other Staff/Employees**: Always return `EmployeeId` and `UserId` (along with `Id` = `EmployeeId` or specific role ID).
     - Frontend clients and consumer services routinely need to correlate the underlying authentication/domain user account with the specific profile entity (Customer, Employee, Trainer) for subscriptions, attendances, payroll, and scheduling. Returning all relevant IDs avoids multiple redundant roundtrips.
+18. **Mandatory Audit Timestamps (`CreatedAt`, `UpdatedAt`) in Administrative & Management DTOs**:
+    - Any query response or DTO returned for management, staff, or administrative list/item views (e.g., packages for management, customers list, lockers list, subscriptions, employee management) must return audit timestamps:
+      - `public DateTimeOffset CreatedAt { get; set; }`
+      - `public DateTimeOffset? UpdatedAt { get; set; }`
+    - Staff and administrators require direct visibility into when records were created or last modified for auditing, tracking, and sorting purposes.
+    - Always use `DateTimeOffset` and `DateTimeOffset?` (never raw `DateTime`).
 
 ### Level B: Established Implementation Conventions (Follow When Applicable)
 1. **CQRS Segregation**: Separate operations into `Commands` (state-modifying) and `Queries` (read-only) under feature-specific directories.
@@ -128,3 +134,4 @@ To prevent cargo-culting and inappropriate code bloat, all practices are categor
 | **Using `DateTime` Instead of `DateTimeOffset`** | Introduces timezone ambiguity, corrupts local-vs-UTC conversions, and leads to inconsistent timestamps. | Use `DateTimeOffset` (and `DateTimeOffset?`) for all date and time properties across entities and DTOs. |
 | **Hardcoding Error Codes as Strings** (`Error.Conflict("Locker.AlreadyActive", ...)`) | Destroys type safety, causes drift between client and server, and breaks centralized error cataloging. | Define all error codes as `public const string` in `ErrorCodes.cs` under the domain class and reference `ErrorCodes.{Domain}.{Constant}`. |
 | **Indiscriminate Route Names for All Endpoints** (`RouteNames.Lockers.GetLockers`, `[HttpGet(Name = ...)]`) | Pollutes `RouteNames.cs`, creates useless coupling, and breaks REST conventions. | Only define route names in `RouteNames.cs` for endpoints required by `CreatedAtRoute` (primarily `GetById`). Normal endpoints do not need route names. |
+| **Omitting Audit Timestamps from Management Responses** | Prevents staff/admins from tracking when records were created or modified. | Always include `DateTimeOffset CreatedAt` and `DateTimeOffset? UpdatedAt` on administrative and management list and item DTOs. |

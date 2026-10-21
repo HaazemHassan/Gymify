@@ -28,7 +28,6 @@ namespace Gymify.Infrastructure.Services
         public async Task<ErrorOr<int>> AddUser(
              DomainUser domainUser,
              string password,
-             UserRole? userRole = default,
              CancellationToken ct = default)
         {
             var isAuthUserLinked = await _userManager.Users.AnyAsync(au => au.DomainUserId == domainUser.Id || au.Email == domainUser.Email, ct);
@@ -66,6 +65,29 @@ namespace Gymify.Infrastructure.Services
             }
 
             return applicationUser.Id;
+        }
+
+        public async Task<ErrorOr<Success>> AssignRoleAsync(int userId, UserRole role, CancellationToken ct = default)
+        {
+            var appUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Id == userId || u.DomainUserId == userId, ct);
+
+            if (appUser is null)
+            {
+                return Error.NotFound(code: ErrorCodes.User.UserNotFound, description: "User not found.");
+            }
+
+            var roleName = role.ToString();
+            if (!await _userManager.IsInRoleAsync(appUser, roleName))
+            {
+                var result = await _userManager.AddToRoleAsync(appUser, roleName);
+                if (!result.Succeeded)
+                {
+                    return Error.Failure(description: "Failed to assign role to user.");
+                }
+            }
+
+            return Result.Success;
         }
 
         public async Task<ErrorOr<UserBaseResponse>> GetUserAuthProfileAsync(int domainUserId, CancellationToken ct = default)

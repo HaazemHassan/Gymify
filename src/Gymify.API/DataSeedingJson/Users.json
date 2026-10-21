@@ -41,7 +41,7 @@
   },
   {
     "Name": "Customer User",
-    "Email": "customer@project.com",
+    "Email": "member@project.com",
     "PhoneNumber": "01234567892",
     "Address": "Giza, Egypt",
     "Password": "12345678Hh",

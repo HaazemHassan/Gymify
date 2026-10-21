@@ -37,7 +37,10 @@
     "Name": "Reception",
     "Permissions": [
       "UsersRead",
-      "UsersWrite"
-    ]
+      "UsersWrite",
+      "LockersRead",
+      "LockersWrite",
+      "SubscriptionsRead",
+      "SubscriptionsWrite"]
   }
 ]

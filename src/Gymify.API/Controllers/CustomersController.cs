@@ -1,11 +1,13 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Gymify.API.Common.Constants;
 using Gymify.API.Requests.Customers.ChangeCustomerApprovalStatus;
 using Gymify.API.Requests.Customers.GetCustomers;
 using Gymify.API.Requests.Customers.UpdateCustomer;
 using Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer;
+using Gymify.Application.Features.Customers.Queries.GetCustomerById;
 using Gymify.Application.Features.Customers.Queries.GetCustomerMe;
 using Gymify.Application.Features.Customers.Queries.GetCustomers;
 
@@ -46,6 +48,25 @@ namespace Gymify.API.Controllers
         {
             var query = _mapper.Map<GetCustomersQuery>(request);
             var result = await Mediator.Send(query, ct);
+
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+        /// <summary>
+        /// Retrieves a customer's full details by customer ID. Requires UsersRead permission.
+        /// </summary>
+        [HttpGet("{id:int}", Name = RouteNames.Customers.GetCustomerById)]
+        [Authorize]
+        [ProducesResponseType(typeof(GetCustomerByIdQueryResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCustomerById([FromRoute] int id, CancellationToken ct)
+        {
+            var result = await Mediator.Send(new GetCustomerByIdQuery(id), ct);
 
             if (result.IsError)
             {

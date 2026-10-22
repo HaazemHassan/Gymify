@@ -17,5 +17,10 @@ namespace Gymify.API.Common.Constants
         {
             public const string GetCustomerById = nameof(GetCustomerById);
         }
+
+        public static class Trainers
+        {
+            public const string GetTrainerById = nameof(GetTrainerById);
+        }
     }
 }

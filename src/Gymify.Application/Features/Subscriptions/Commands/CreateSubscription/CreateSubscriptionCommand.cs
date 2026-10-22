@@ -10,6 +10,7 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
     {
         public int CustomerId { get; set; }
         public int PackageId { get; set; }
+        public int? TrainerId { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public string? Notes { get; set; }
     }

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Packages.Shared
 {
@@ -34,6 +35,22 @@ namespace Gymify.Application.Features.Packages.Shared
             return ruleBuilder
                 .MaximumLength(1000)
                 .WithMessage("{PropertyName} cannot exceed 1000 characters");
+        }
+
+        public static IRuleBuilderOptions<T, Gymify.Domain.Common.Enums.PackageType> ApplyPackageTypeRules<T>(
+            this IRuleBuilder<T, Gymify.Domain.Common.Enums.PackageType> ruleBuilder)
+        {
+            return ruleBuilder
+                .IsInEnum()
+                .WithMessage("Invalid package type");
+        }
+
+        public static IRuleBuilderOptions<T, int?> ApplyTrainerIdRules<T>(
+            this IRuleBuilder<T, int?> ruleBuilder)
+        {
+            return ruleBuilder
+                .GreaterThan(0)
+                .WithMessage("Trainer ID must be greater than 0");
         }
     }
 }

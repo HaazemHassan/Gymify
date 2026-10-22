@@ -8,12 +8,15 @@ namespace Gymify.Domain.Common.Enums
         PackagesRead = 4,
         PackagesWrite = 5,
         PackagesDelete = 6,
-        AttendanceCheckIn = 7,
-        AttendanceCheckOut = 8,
+        AttendanceWrite = 7,
         AttendanceRead = 9,
         LockersRead = 10,
         LockersWrite = 11,
         SubscriptionsRead = 12,
-        SubscriptionsWrite = 13
+        SubscriptionsWrite = 13,
+        CustomersRead = 14,
+        CustomersWrite = 15,
+        TrainersRead = 16,
+        TrainersWrite = 17
     }
 }

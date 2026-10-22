@@ -2,8 +2,8 @@ using FluentValidation;
 using Microsoft.Extensions.Options;
 using Gymify.Application.Common;
 using Gymify.Application.Common.Options;
-using Gymify.Application.Features.Users.Common;
 using Gymify.Application.ServicesContracts.Infrastructure;
+using Gymify.Application.Features.Users.Shared;
 
 namespace Gymify.Application.Features.Authentication.Commands.RegisterCustomer
 {
@@ -32,7 +32,7 @@ namespace Gymify.Application.Features.Authentication.Commands.RegisterCustomer
 
             When(x => !string.IsNullOrWhiteSpace(x.Name), () =>
             {
-                RuleFor(x => x.Name).ApplyUserNameRules();
+                RuleFor(x => x.Name).ApplyUserFullNameRules();
             });
 
 

@@ -7,6 +7,7 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public int PackageId { get; set; }
+        public int? TrainerId { get; set; }
         public string PackageName { get; set; } = string.Empty;
         public decimal PackagePrice { get; set; }
         public int PackageDuration { get; set; }
@@ -14,6 +15,7 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public SubscriptionType Type { get; set; }
         public string? Notes { get; set; }
     }
 }

@@ -1,26 +1,35 @@
 using FluentValidation;
 using Gymify.Application.Common.Options;
+using Gymify.Domain.Common.Constants;
 
-namespace Gymify.Application.Features.Users.Common
+namespace Gymify.Application.Features.Users.Shared
 {
     public static class UserValidationRules
     {
-        public static IRuleBuilderOptions<T, string?> ApplyUserNameRules<T>(
+        public static IRuleBuilderOptions<T, string?> ApplyUserFullNameRules<T>(
             this IRuleBuilder<T, string?> ruleBuilder,
             int minLength = 3,
-            int maxLength = 15
+            int maxLength = 100
         )
         {
             var rule = ruleBuilder;
-
 
             return rule
                 .MinimumLength(minLength)
                     .WithMessage($"{{PropertyName}} must be at least {minLength} characters")
                 .MaximumLength(maxLength)
                     .WithMessage($"{{PropertyName}} cannot exceed {maxLength} characters")
-                .Matches(@"^\p{L}+$")
-                    .WithMessage("{PropertyName} must contain only letters");
+                .Matches(@"^\s*[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*\s*$")
+                    .WithMessage("{PropertyName} must contain only letters and spaces");
+        }
+
+        public static IRuleBuilderOptions<T, string?> ApplyNameRules<T>(
+            this IRuleBuilder<T, string?> ruleBuilder,
+            int minLength = 3,
+            int maxLength = 100
+        )
+        {
+            return ruleBuilder.ApplyUserFullNameRules(minLength, maxLength);
         }
 
 
@@ -82,6 +91,7 @@ namespace Gymify.Application.Features.Users.Common
                     var password = passwordSelector((T)model);
                     return password == confirmPassword;
                 })
+                .WithErrorCode(ErrorCodes.Authentication.PasswordsDoNotMatch)
                 .WithMessage("Passwords do not match");
         }
     }

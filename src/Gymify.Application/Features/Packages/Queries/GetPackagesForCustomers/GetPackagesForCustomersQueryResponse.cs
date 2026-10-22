@@ -1,3 +1,5 @@
+using Gymify.Domain.Common.Enums;
+
 namespace Gymify.Application.Features.Packages.Queries.GetPackagesForCustomers
 {
     public class GetPackagesForCustomersQueryResponse
@@ -7,5 +9,6 @@ namespace Gymify.Application.Features.Packages.Queries.GetPackagesForCustomers
         public decimal Price { get; set; }
         public int Duration { get; set; }
         public string? Description { get; set; }
+        public PackageType Type { get; set; }
     }
 }

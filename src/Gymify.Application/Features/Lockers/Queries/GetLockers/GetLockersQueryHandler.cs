@@ -16,7 +16,7 @@ namespace Gymify.Application.Features.Lockers.Queries.GetLockers
 
         public async Task<ErrorOr<List<GetLockersQueryResponse>>> Handle(GetLockersQuery request, CancellationToken cancellationToken)
         {
-            var spec = new GetLockersSpec(request.IsActive);
+            var spec = new GetLockersSpec(request.IsActive, request.Search);
             var lockers = await _unitOfWork.Lockers.ListAsync<GetLockersQueryResponse>(spec, cancellationToken);
 
             return lockers;

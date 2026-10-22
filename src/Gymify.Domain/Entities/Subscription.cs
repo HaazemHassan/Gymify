@@ -18,6 +18,8 @@ namespace Gymify.Domain.Entities
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             PaymentMethod paymentMethod,
+            SubscriptionType type = SubscriptionType.Regular,
+            int? trainerId = null,
             string? packageDescription = null,
             string? notes = null)
         {
@@ -29,6 +31,8 @@ namespace Gymify.Domain.Entities
             StartDate = startDate;
             EndDate = endDate;
             PaymentMethod = paymentMethod;
+            Type = type;
+            TrainerId = type == SubscriptionType.Private ? trainerId : null;
             PackageDescription = packageDescription;
             Notes = notes;
         }
@@ -49,6 +53,9 @@ namespace Gymify.Domain.Entities
         public DateTimeOffset EndDate { get; private set; }
 
         public PaymentMethod PaymentMethod { get; private set; }
+        public SubscriptionType Type { get; private set; } = SubscriptionType.Regular;
+        public int? TrainerId { get; private set; }
+        public Trainer? Trainer { get; private set; }
         public string? Notes { get; private set; }
 
         public bool IsActive(DateTimeOffset now) => StartDate <= now && EndDate >= now;

@@ -40,7 +40,7 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a paginated list of customers with search and filters by name, email, phone, and approval status. Requires UsersRead permission.
+        /// Retrieves a paginated list of customers with search and filters by name, email, phone, and approval status. Requires CustomersRead permission.
         /// </summary>
         [HttpGet]
         [Authorize]
@@ -58,7 +58,7 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a customer's full details by customer ID. Requires UsersRead permission.
+        /// Retrieves a customer's full details by customer ID. Requires CustomersRead permission.
         /// </summary>
         [HttpGet("{id:int}", Name = RouteNames.Customers.GetCustomerById)]
         [Authorize]
@@ -77,7 +77,7 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Changes the approval status of a customer (Approved, Rejected, Pending). Requires UsersWrite permission.
+        /// Changes the approval status of a customer (Approved, Rejected, Pending). Requires CustomersWrite permission.
         /// </summary>
         [HttpPatch("{id:int}/approval-status")]
         [Authorize]
@@ -104,7 +104,7 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Updates customer details and domain user properties. All fields are nullable for partial or full updates. Requires UsersWrite permission.
+        /// Updates customer details and domain user properties. All fields are nullable for partial or full updates. Requires CustomersWrite permission.
         /// </summary>
         [HttpPatch("{id:int}")]
         [Authorize]

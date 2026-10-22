@@ -1,3 +1,5 @@
+using Gymify.Domain.Common.Enums;
+
 namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
 {
     public class UpdatePackageCommandResponse
@@ -8,6 +10,8 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
         public int Duration { get; set; }
         public string? Description { get; set; }
         public bool IsActive { get; set; }
+        public PackageType Type { get; set; }
+        public int? TrainerId { get; set; }
 
         public UpdatePackageCommandResponse()
         {
@@ -19,7 +23,9 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
             decimal price,
             int duration,
             string? description,
-            bool isActive)
+            bool isActive,
+            PackageType type,
+            int? trainerId)
         {
             Id = id;
             Name = name;
@@ -27,6 +33,8 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
             Duration = duration;
             Description = description;
             IsActive = isActive;
+            Type = type;
+            TrainerId = trainerId;
         }
     }
 }

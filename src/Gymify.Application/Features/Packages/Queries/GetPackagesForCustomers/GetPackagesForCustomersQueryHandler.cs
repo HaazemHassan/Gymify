@@ -18,8 +18,8 @@ namespace Gymify.Application.Features.Packages.Queries.GetPackagesForCustomers
 
         public async Task<ErrorOr<PaginatedResult<GetPackagesForCustomersQueryResponse>>> Handle(GetPackagesForCustomersQuery request, CancellationToken cancellationToken)
         {
-            var dataSpec = new ActivePackagesPaginatedSpec(request.PageNumber, request.PageSize, request.Search);
-            var countSpec = new PackagesFilteredSpec(request.Search, isActive: true);
+            var dataSpec = new ActivePackagesPaginatedSpec(request.PageNumber, request.PageSize, request.Search, request.Types);
+            var countSpec = new PackagesFilteredSpec(request.Search, isActive: true, types: request.Types);
 
             var packages = await _unitOfWork.Packages.ListAsync<GetPackagesForCustomersQueryResponse>(dataSpec, cancellationToken);
             var totalCount = await _unitOfWork.Packages.CountAsync(countSpec, cancellationToken);

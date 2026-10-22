@@ -26,6 +26,23 @@ namespace Gymify.Application.Features.Packages.Commands.CreatePackage
             {
                 RuleFor(x => x.Description).ApplyDescriptionRules();
             });
+
+            RuleFor(x => x.Type).ApplyPackageTypeRules();
+
+            When(x => x.Type == Gymify.Domain.Common.Enums.PackageType.Private, () =>
+            {
+                RuleFor(x => x.TrainerId)
+                    .NotNull()
+                    .WithMessage("Trainer ID is required for private packages.")
+                    .ApplyTrainerIdRules();
+            });
+
+            When(x => x.Type != Gymify.Domain.Common.Enums.PackageType.Private, () =>
+            {
+                RuleFor(x => x.TrainerId)
+                    .Null()
+                    .WithMessage("Trainer ID must be null for non-private packages.");
+            });
         }
     }
 }

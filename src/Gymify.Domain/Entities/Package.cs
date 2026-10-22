@@ -1,3 +1,4 @@
+using Gymify.Domain.Common.Enums;
 using Gymify.Domain.Entities.Base;
 
 namespace Gymify.Domain.Entities
@@ -13,13 +14,17 @@ namespace Gymify.Domain.Entities
             decimal price,
             int duration,
             string? description = null,
-            bool isActive = true)
+            bool isActive = true,
+            PackageType type = PackageType.Regular,
+            int? trainerId = null)
         {
             Name = name;
             Price = price;
             Duration = duration;
             Description = description;
             IsActive = isActive;
+            Type = type;
+            TrainerId = type == PackageType.Private ? trainerId : null;
         }
 
         public string Name { get; private set; } = string.Empty;
@@ -27,6 +32,9 @@ namespace Gymify.Domain.Entities
         public string? Description { get; private set; }
         public int Duration { get; private set; }
         public bool IsActive { get; private set; } = true;
+        public PackageType Type { get; private set; } = PackageType.Regular;
+        public int? TrainerId { get; private set; }
+        public Trainer? Trainer { get; private set; }
 
         public ICollection<Subscription> Subscriptions { get; private set; } = new List<Subscription>();
 
@@ -35,9 +43,10 @@ namespace Gymify.Domain.Entities
             decimal? price = null,
             int? duration = null,
             string? description = null,
-            bool? isActive = null)
+            bool? isActive = null,
+            PackageType? type = null,
+            int? trainerId = null)
         {
-
             if (!string.IsNullOrWhiteSpace(name))
             {
                 Name = name;
@@ -47,6 +56,7 @@ namespace Gymify.Domain.Entities
             {
                 Price = price.Value;
             }
+
             if (duration.HasValue)
             {
                 Duration = duration.Value;
@@ -60,6 +70,16 @@ namespace Gymify.Domain.Entities
             if (isActive.HasValue)
             {
                 IsActive = isActive.Value;
+            }
+
+            if (type.HasValue)
+            {
+                Type = type.Value;
+                TrainerId = type.Value == PackageType.Private ? trainerId : null;
+            }
+            else if (trainerId.HasValue && Type == PackageType.Private)
+            {
+                TrainerId = trainerId.Value;
             }
         }
 

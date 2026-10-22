@@ -2,7 +2,8 @@ using FluentValidation;
 using Microsoft.Extensions.Options;
 using Gymify.Application.Common;
 using Gymify.Application.Common.Options;
-using Gymify.Application.Features.Users.Common;
+using Gymify.Application.Features.Users.Shared;
+using Gymify.Domain.Common.Constants;
 
 namespace Gymify.Application.Features.Authentication.Commands.ChangePassword
 {
@@ -22,8 +23,6 @@ namespace Gymify.Application.Features.Authentication.Commands.ChangePassword
             RuleFor(x => x.NewPassword).Required();
             RuleFor(x => x.ConfirmNewPassword).Required();
 
-
-
             When(x => !string.IsNullOrWhiteSpace(x.CurrentPassword), () =>
             {
                 RuleFor(x => x.CurrentPassword)
@@ -40,6 +39,14 @@ namespace Gymify.Application.Features.Authentication.Commands.ChangePassword
             {
                 RuleFor(x => x.ConfirmNewPassword)
                     .ApplyConfirmPasswordRules(x => x.NewPassword);
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.CurrentPassword) && !string.IsNullOrWhiteSpace(x.NewPassword), () =>
+            {
+                RuleFor(x => x.NewPassword)
+                    .Must((command, newPassword) => command.CurrentPassword != newPassword)
+                    .WithErrorCode(ErrorCodes.Authentication.NewPasswordSameAsCurrent)
+                    .WithMessage("New password cannot be the same as the current password.");
             });
         }
     }

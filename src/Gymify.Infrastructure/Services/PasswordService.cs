@@ -34,13 +34,31 @@ namespace Gymify.Infrastructure.Services
                 return Error.NotFound(code: ErrorCodes.User.UserNotFound, description: "User not found.");
             }
 
+            if (currentPassword == newPassword)
+            {
+                return Error.Validation(
+                    code: ErrorCodes.Authentication.NewPasswordSameAsCurrent,
+                    description: "New password cannot be the same as the current password.",
+                    metadata: new Dictionary<string, object> { { "field", "NewPassword" } });
+            }
+
             var result = await userManager.ChangePasswordAsync(appUser, currentPassword, newPassword);
 
             if (!result.Succeeded)
             {
-                return Error.Unauthorized(
-                    code: ErrorCodes.Authentication.InvalidPassword,
-                    description: result.Errors.FirstOrDefault()?.Description ?? "Password change failed");
+                var firstError = result.Errors.FirstOrDefault();
+                if (firstError?.Code == "PasswordMismatch")
+                {
+                    return Error.Unauthorized(
+                        code: ErrorCodes.Authentication.IncorrectCurrentPassword,
+                        description: "Current password is incorrect.",
+                        metadata: new Dictionary<string, object> { { "field", "CurrentPassword" } });
+                }
+
+                return Error.Validation(
+                    code: ErrorCodes.Authentication.PasswordChangeFailed,
+                    description: firstError?.Description ?? "Password change failed.",
+                    metadata: new Dictionary<string, object> { { "field", "NewPassword" } });
             }
 
             return Result.Success;

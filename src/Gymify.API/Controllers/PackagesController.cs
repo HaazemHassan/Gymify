@@ -1,16 +1,17 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Gymify.API.Common.Constants;
-using Gymify.Api.Requests.Common.Pagination;
 using Gymify.Api.Requests.Packages.CreatePackage;
 using Gymify.Api.Requests.Packages.UpdatePackage;
+using Gymify.API.Common.Constants;
+using Gymify.API.Requests.Packages.GetPackagesForCustomers;
+using Gymify.API.Requests.Packages.GetPackagesForManagement;
 using Gymify.Application.Features.Packages.Commands.CreatePackage;
 using Gymify.Application.Features.Packages.Commands.UpdatePackage;
 using Gymify.Application.Features.Packages.Queries.GetPackageById;
 using Gymify.Application.Features.Packages.Queries.GetPackageByIdForManagement;
 using Gymify.Application.Features.Packages.Queries.GetPackagesForCustomers;
 using Gymify.Application.Features.Packages.Queries.GetPackagesForManagement;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
 {
@@ -24,10 +25,10 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves all active packages for customers / public view with pagination.
+        /// Retrieves all active packages for customers / public view with pagination and optional type filter.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetPackagesForCustomers([FromQuery] BasicPaginationRequest request, CancellationToken ct)
+        public async Task<IActionResult> GetPackagesForCustomers([FromQuery] GetPackagesForCustomersRequest request, CancellationToken ct)
         {
             var query = _mapper.Map<GetPackagesForCustomersQuery>(request);
             var result = await Mediator.Send(query, ct);
@@ -41,11 +42,11 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves all packages (active & inactive) for management with pagination. Requires PackagesRead permission.
+        /// Retrieves all packages (active & inactive) for management with pagination and optional type/trainer filters. Requires PackagesRead permission.
         /// </summary>
         [HttpGet("management")]
         [Authorize]
-        public async Task<IActionResult> GetPackagesForManagement([FromQuery] BasicPaginationRequest request, CancellationToken ct)
+        public async Task<IActionResult> GetPackagesForManagement([FromQuery] GetPackagesForManagementRequest request, CancellationToken ct)
         {
             var query = _mapper.Map<GetPackagesForManagementQuery>(request);
             var result = await Mediator.Send(query, ct);

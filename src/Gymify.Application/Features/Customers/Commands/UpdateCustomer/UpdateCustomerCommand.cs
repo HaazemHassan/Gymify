@@ -5,7 +5,7 @@ using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
 {
-    [Authorize(Permissions = [Permission.UsersWrite])]
+    [Authorize(Permissions = [Permission.CustomersWrite])]
     public class UpdateCustomerCommand : ICommand<UpdateCustomerCommandResponse>, IAuthorizedRequest
     {
         public int CustomerId { get; set; }

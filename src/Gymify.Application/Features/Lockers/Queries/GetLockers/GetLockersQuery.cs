@@ -9,14 +9,16 @@ namespace Gymify.Application.Features.Lockers.Queries.GetLockers
     public class GetLockersQuery : IQuery<List<GetLockersQueryResponse>>, IAuthorizedRequest
     {
         public bool? IsActive { get; set; }
+        public string? Search { get; set; }
 
         public GetLockersQuery()
         {
         }
 
-        public GetLockersQuery(bool? isActive)
+        public GetLockersQuery(bool? isActive, string? search = null)
         {
             IsActive = isActive;
+            Search = search;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Gymify.Domain.Common.Enums;
 using Gymify.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -8,7 +9,12 @@ namespace Gymify.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Subscription> builder)
         {
-            builder.ToTable("Subscriptions", "gym");
+            builder.ToTable("Subscriptions", "gym", t =>
+            {
+                t.HasCheckConstraint(
+                    "CK_Subscriptions_Type_TrainerId",
+                    "([Type] = 'Private' AND [TrainerId] IS NOT NULL) OR ([Type] <> 'Private' AND [TrainerId] IS NULL)");
+            });
 
             builder.HasOne(s => s.Customer)
                 .WithMany(c => c.Subscriptions)
@@ -18,6 +24,11 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.HasOne(s => s.Package)
                 .WithMany(p => p.Subscriptions)
                 .HasForeignKey(s => s.PackageId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(s => s.Trainer)
+                .WithMany()
+                .HasForeignKey(s => s.TrainerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(s => s.PackageName)
@@ -42,6 +53,12 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(s => s.PaymentMethod)
                 .HasConversion<string>()
                 .HasMaxLength(50);
+
+            builder.Property(s => s.Type)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasDefaultValue(SubscriptionType.Regular);
 
             builder.Property(s => s.Notes)
                 .HasMaxLength(2000);

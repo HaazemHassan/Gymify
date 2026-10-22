@@ -35,6 +35,16 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
                 RuleFor(x => x.Description).ApplyDescriptionRules();
             });
 
+            When(x => x.Type.HasValue, () =>
+            {
+                RuleFor(x => x.Type!.Value).ApplyPackageTypeRules();
+            });
+
+            When(x => x.TrainerId.HasValue, () =>
+            {
+                RuleFor(x => x.TrainerId).ApplyTrainerIdRules();
+            });
+
             RuleFor(x => x)
                 .Must(HaveAtLeastOneNonNullProperty)
                 .WithMessage("At least one property must be provided to update");
@@ -46,7 +56,9 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
                    command.Price.HasValue ||
                    command.Duration.HasValue ||
                    command.Description != null ||
-                   command.IsActive.HasValue;
+                   command.IsActive.HasValue ||
+                   command.Type.HasValue ||
+                   command.TrainerId.HasValue;
         }
     }
 }

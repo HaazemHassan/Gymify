@@ -22,12 +22,12 @@ namespace Gymify.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves all lockers with optional isActive filter and real-time availability status. Requires LockersRead permission.
+        /// Retrieves all lockers with optional isActive and search filters, and real-time availability status. Requires LockersRead permission.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetLockers([FromQuery] bool? isActive, CancellationToken ct)
+        public async Task<IActionResult> GetLockers([FromQuery] bool? isActive, [FromQuery] string? search, CancellationToken ct)
         {
-            var query = new GetLockersQuery(isActive);
+            var query = new GetLockersQuery(isActive, search);
             var result = await Mediator.Send(query, ct);
 
             if (result.IsError)

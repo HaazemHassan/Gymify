@@ -6,7 +6,7 @@ using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Customers.Queries.GetCustomers
 {
-    [Authorize(Permissions = [Permission.UsersRead])]
+    [Authorize(Permissions = [Permission.CustomersRead])]
     public class GetCustomersQuery : PaginatedQuery, IQuery<PaginatedResult<GetCustomersQueryResponse>>, IAuthorizedRequest
     {
         public ApprovalStatus? ApprovalStatus { get; set; }

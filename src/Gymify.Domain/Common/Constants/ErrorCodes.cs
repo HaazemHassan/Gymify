@@ -34,6 +34,7 @@ public static class ErrorCodes
     public static class Trainer
     {
         public const string TrainerNotFound = "TRAINER_NOT_FOUND";
+        public const string TrainerInactive = "TRAINER_INACTIVE";
         public const string InvalidExperience = "TRAINER_INVALID_EXPERIENCE";
     }
 
@@ -53,6 +54,9 @@ public static class ErrorCodes
         public const string SubscriptionNotFound = "SUBSCRIPTION_NOT_FOUND";
         public const string CustomerAlreadyHasActiveSubscription = "SUBSCRIPTION_CUSTOMER_ALREADY_HAS_ACTIVE_SUBSCRIPTION";
         public const string PackageInactive = "SUBSCRIPTION_PACKAGE_INACTIVE";
+        public const string TrainerRequired = "SUBSCRIPTION_TRAINER_REQUIRED";
+        public const string TrainerMismatch = "SUBSCRIPTION_TRAINER_MISMATCH";
+        public const string PackageNotFound = "SUBSCRIPTION_PACKAGE_NOT_FOUND";
     }
 
     public static class Authentication
@@ -62,6 +66,10 @@ public static class ErrorCodes
         public const string InvalidRefreshToken = "AUTH_INVALID_REFRESH_TOKEN";
         public const string AlreadySignedOut = "AUTH_ALREADY_SIGNED_OUT";
         public const string InvalidPassword = "AUTH_PASSWORD_CHANGE_FAILED";
+        public const string PasswordChangeFailed = "AUTH_PASSWORD_CHANGE_FAILED";
+        public const string IncorrectCurrentPassword = "AUTH_INCORRECT_CURRENT_PASSWORD";
+        public const string PasswordsDoNotMatch = "AUTH_PASSWORDS_DO_NOT_MATCH";
+        public const string NewPasswordSameAsCurrent = "AUTH_NEW_PASSWORD_SAME_AS_CURRENT";
         public const string EmailNotConfirmed = "AUTH_EMAIL_NOT_VERIFIED";
         public const string EmailAlreadyConfirmed = "AUTH_EMAIL_ALREADY_CONFIRMED";
         public const string InvalidEmailConfirmationCode = "AUTH_INVALID_EMAIL_CONFIRMATION_CODE";

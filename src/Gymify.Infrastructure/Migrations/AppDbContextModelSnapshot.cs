@@ -362,6 +362,16 @@ namespace Gymify.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("TrainerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Regular");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -370,7 +380,12 @@ namespace Gymify.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Packages", "gym");
+                    b.HasIndex("TrainerId");
+
+                    b.ToTable("Packages", "gym", t =>
+                        {
+                            t.HasCheckConstraint("CK_Packages_Type_TrainerId", "([Type] = 'Private' AND [TrainerId] IS NOT NULL) OR ([Type] <> 'Private' AND [TrainerId] IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.RefreshToken", b =>
@@ -472,6 +487,16 @@ namespace Gymify.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("StartDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("TrainerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Regular");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -482,9 +507,14 @@ namespace Gymify.Infrastructure.Migrations
 
                     b.HasIndex("PackageId");
 
+                    b.HasIndex("TrainerId");
+
                     b.HasIndex("CustomerId", "EndDate");
 
-                    b.ToTable("Subscriptions", "gym");
+                    b.ToTable("Subscriptions", "gym", t =>
+                        {
+                            t.HasCheckConstraint("CK_Subscriptions_Type_TrainerId", "([Type] = 'Private' AND [TrainerId] IS NOT NULL) OR ([Type] <> 'Private' AND [TrainerId] IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.Trainer", b =>
@@ -894,6 +924,16 @@ namespace Gymify.Infrastructure.Migrations
                     b.Navigation("DomainUser");
                 });
 
+            modelBuilder.Entity("Gymify.Domain.Entities.Package", b =>
+                {
+                    b.HasOne("Gymify.Domain.Entities.Trainer", "Trainer")
+                        .WithMany()
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Trainer");
+                });
+
             modelBuilder.Entity("Gymify.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("Gymify.Infrastructure.Data.Identity.Entities.ApplicationUser", null)
@@ -917,9 +957,16 @@ namespace Gymify.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Gymify.Domain.Entities.Trainer", "Trainer")
+                        .WithMany()
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Customer");
 
                     b.Navigation("Package");
+
+                    b.Navigation("Trainer");
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.Trainer", b =>

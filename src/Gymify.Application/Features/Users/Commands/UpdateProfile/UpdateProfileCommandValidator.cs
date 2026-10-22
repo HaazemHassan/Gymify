@@ -1,6 +1,6 @@
 using FluentValidation;
 using Gymify.Application.Common;
-using Gymify.Application.Features.Users.Common;
+using Gymify.Application.Features.Users.Shared;
 using Gymify.Application.ServicesContracts.Infrastructure;
 
 namespace Gymify.Application.Features.Users.Commands.UpdateProfile
@@ -21,7 +21,7 @@ namespace Gymify.Application.Features.Users.Commands.UpdateProfile
         {
             When(x => !string.IsNullOrWhiteSpace(x.Name), () =>
             {
-                RuleFor(x => x.Name).ApplyUserNameRules();
+                RuleFor(x => x.Name).ApplyUserFullNameRules();
             });
 
             When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber), () =>

@@ -4,7 +4,11 @@
     "Permissions": [
       "UsersRead",
       "UsersWrite",
-      "UsersDelete"
+      "UsersDelete",
+      "CustomersRead",
+      "CustomersWrite",
+      "TrainersRead",
+      "TrainersWrite"
     ]
   },
   {
@@ -24,7 +28,11 @@
     "Permissions": [
       "UsersRead",
       "UsersWrite",
-      "UsersDelete"
+      "UsersDelete",
+      "CustomersRead",
+      "CustomersWrite",
+      "TrainersRead",
+      "TrainersWrite"
     ]
   },
   {
@@ -38,9 +46,18 @@
     "Permissions": [
       "UsersRead",
       "UsersWrite",
+      "CustomersRead",
+      "CustomersWrite",
+      "TrainersRead",
+      "TrainersWrite",
       "LockersRead",
       "LockersWrite",
+      "PackagesWrite",
+      "PackagesRead",
       "SubscriptionsRead",
-      "SubscriptionsWrite"]
+      "SubscriptionsWrite",
+      "AttendanceRead",
+      "AttendanceWrite"
+    ]
   }
 ]

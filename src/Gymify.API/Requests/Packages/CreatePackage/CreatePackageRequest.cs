@@ -1,3 +1,5 @@
+using Gymify.Domain.Common.Enums;
+
 namespace Gymify.Api.Requests.Packages.CreatePackage
 {
     public class CreatePackageRequest
@@ -7,5 +9,7 @@ namespace Gymify.Api.Requests.Packages.CreatePackage
         public int Duration { get; set; }
         public string? Description { get; set; }
         public bool IsActive { get; set; } = true;
+        public PackageType Type { get; set; } = PackageType.Regular;
+        public int? TrainerId { get; set; }
     }
 }

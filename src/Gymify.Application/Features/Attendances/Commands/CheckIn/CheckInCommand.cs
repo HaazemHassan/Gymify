@@ -5,7 +5,7 @@ using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Attendances.Commands.CheckIn
 {
-    [Authorize(Permissions = [Permission.AttendanceCheckIn])]
+    [Authorize(Permissions = [Permission.AttendanceWrite])]
     public class CheckInCommand : ICommand<CheckInCommandResponse>, IAuthorizedRequest
     {
         public string Code { get; set; } = string.Empty;

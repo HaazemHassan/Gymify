@@ -1,3 +1,4 @@
+using Gymify.Domain.Common.Enums;
 using Gymify.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -8,7 +9,12 @@ namespace Gymify.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Package> builder)
         {
-            builder.ToTable("Packages", "gym");
+            builder.ToTable("Packages", "gym", t =>
+            {
+                t.HasCheckConstraint(
+                    "CK_Packages_Type_TrainerId",
+                    "([Type] = 'Private' AND [TrainerId] IS NOT NULL) OR ([Type] <> 'Private' AND [TrainerId] IS NULL)");
+            });
 
             builder.Property(p => p.Name)
                 .IsRequired()
@@ -26,6 +32,17 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(p => p.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
+
+            builder.Property(p => p.Type)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasDefaultValue(PackageType.Regular);
+
+            builder.HasOne(p => p.Trainer)
+                .WithMany()
+                .HasForeignKey(p => p.TrainerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

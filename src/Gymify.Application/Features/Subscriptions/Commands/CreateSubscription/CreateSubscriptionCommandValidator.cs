@@ -14,6 +14,7 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
         {
             RuleFor(x => x.CustomerId).ApplyCustomerIdRules();
             RuleFor(x => x.PackageId).ApplyPackageIdRules();
+            RuleFor(x => x.TrainerId).ApplyTrainerIdRules();
             RuleFor(x => x.PaymentMethod).ApplyPaymentMethodRules();
             RuleFor(x => x.Notes).ApplyNotesRules();
         }

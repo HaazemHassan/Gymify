@@ -5,11 +5,11 @@ namespace Gymify.Application.Features.Trainers.Specifications
 {
     public class TrainersFilteredSpec : Specification<Trainer>
     {
-        public TrainersFilteredSpec(string? search, bool isActive = true)
+        public TrainersFilteredSpec(string? search, bool? isActive = true)
         {
-            if (isActive)
+            if (isActive.HasValue)
             {
-                Query.Where(t => t.Employee.DomainUser.IsActive);
+                Query.Where(t => t.IsActive == isActive.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(search))

@@ -5,7 +5,7 @@ using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Customers.Queries.GetCustomerById
 {
-    [Authorize(Permissions = [Permission.UsersRead])]
+    [Authorize(Permissions = [Permission.CustomersRead])]
     public class GetCustomerByIdQuery : IQuery<GetCustomerByIdQueryResponse>, IAuthorizedRequest
     {
         public int Id { get; set; }

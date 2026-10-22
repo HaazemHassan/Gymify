@@ -1,7 +1,7 @@
 using FluentValidation;
 using Gymify.Application.Common;
 using Gymify.Application.Features.Customers.Shared;
-using Gymify.Application.Features.Users.Common;
+using Gymify.Application.Features.Users.Shared;
 using Gymify.Application.ServicesContracts.Infrastructure;
 
 namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
@@ -24,7 +24,7 @@ namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
 
             When(x => !string.IsNullOrWhiteSpace(x.Name), () =>
             {
-                RuleFor(x => x.Name).ApplyUserNameRules();
+                RuleFor(x => x.Name).ApplyUserFullNameRules();
             });
 
             When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber), () =>

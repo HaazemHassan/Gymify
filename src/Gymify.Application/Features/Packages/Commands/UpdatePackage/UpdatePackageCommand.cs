@@ -14,5 +14,7 @@ namespace Gymify.Application.Features.Packages.Commands.UpdatePackage
         public int? Duration { get; set; }
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
+        public PackageType? Type { get; set; }
+        public int? TrainerId { get; set; }
     }
 }

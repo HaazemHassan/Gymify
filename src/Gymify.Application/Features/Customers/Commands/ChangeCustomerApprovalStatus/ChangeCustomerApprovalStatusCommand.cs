@@ -5,7 +5,7 @@ using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus
 {
-    [Authorize(Permissions = [Permission.UsersWrite])]
+    [Authorize(Permissions = [Permission.CustomersWrite])]
     public class ChangeCustomerApprovalStatusCommand : ICommand<ChangeCustomerApprovalStatusCommandResponse>, IAuthorizedRequest
     {
         public int CustomerId { get; set; }

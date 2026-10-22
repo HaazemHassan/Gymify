@@ -2,7 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Options;
 using Gymify.Application.Common;
 using Gymify.Application.Common.Options;
-using Gymify.Application.Features.Users.Common;
+using Gymify.Application.Features.Users.Shared;
 
 namespace Gymify.Application.Features.Authentication.Commands.ResetPassword
 {

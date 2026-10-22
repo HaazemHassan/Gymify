@@ -1,8 +1,8 @@
-using ErrorOr;
-using Gymify.Application.Common.CQRS;
+using AutoMapper;
 using Gymify.Application.Features.Subscriptions.Commands.CreateSubscription.Specifications;
 using Gymify.Application.ServicesContracts.Infrastructure;
 using Gymify.Domain.Common.Constants;
+using Gymify.Domain.Common.Enums;
 using Gymify.Domain.Entities;
 using Gymify.Domain.RepositoriesContracts;
 
@@ -12,11 +12,16 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IMapper _mapper;
 
-        public CreateSubscriptionCommandHandler(IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider)
+        public CreateSubscriptionCommandHandler(
+            IUnitOfWork unitOfWork,
+            IDateTimeProvider dateTimeProvider,
+            IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _dateTimeProvider = dateTimeProvider;
+            _mapper = mapper;
         }
 
         public async Task<ErrorOr<CreateSubscriptionCommandResponse>> Handle(CreateSubscriptionCommand request, CancellationToken cancellationToken)
@@ -54,6 +59,84 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
                     $"Package '{package.Name}' is not active.");
             }
 
+            SubscriptionType subscriptionType;
+            int? subscriptionTrainerId;
+
+            switch (package.Type)
+            {
+                case PackageType.Regular:
+                subscriptionType = SubscriptionType.Regular;
+                subscriptionTrainerId = null;
+                break;
+
+                case PackageType.Private:
+                subscriptionType = SubscriptionType.Private;
+
+                if (!package.TrainerId.HasValue)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Package.PackageNotFound,
+                        "Private package does not have an assigned trainer.");
+                }
+
+                if (request.TrainerId.HasValue && request.TrainerId.Value != package.TrainerId.Value)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Subscription.TrainerMismatch,
+                        $"This private package is assigned to trainer ID {package.TrainerId.Value}, not {request.TrainerId.Value}.");
+                }
+
+                subscriptionTrainerId = package.TrainerId.Value;
+
+                var privateTrainer = await _unitOfWork.Trainers.GetByIdAsync(subscriptionTrainerId.Value, cancellationToken);
+                if (privateTrainer is null)
+                {
+                    return Error.NotFound(
+                        ErrorCodes.Trainer.TrainerNotFound,
+                        $"Trainer with ID {subscriptionTrainerId.Value} was not found.");
+                }
+
+                if (!privateTrainer.IsActive)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Trainer.TrainerInactive,
+                        $"Trainer with ID {subscriptionTrainerId.Value} is not active.");
+                }
+                break;
+
+                case PackageType.SharedPrivate:
+                subscriptionType = SubscriptionType.Private;
+
+                if (!request.TrainerId.HasValue)
+                {
+                    return Error.Validation(
+                        ErrorCodes.Subscription.TrainerRequired,
+                        "Trainer ID is required for shared private packages.",
+                        metadata: new Dictionary<string, object> { { "field", nameof(request.TrainerId) } });
+                }
+
+                subscriptionTrainerId = request.TrainerId.Value;
+
+                var sharedTrainer = await _unitOfWork.Trainers.GetByIdAsync(subscriptionTrainerId.Value, cancellationToken);
+                if (sharedTrainer is null)
+                {
+                    return Error.NotFound(
+                        ErrorCodes.Trainer.TrainerNotFound,
+                        $"Trainer with ID {subscriptionTrainerId.Value} was not found.");
+                }
+
+                if (!sharedTrainer.IsActive)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Trainer.TrainerInactive,
+                        $"Trainer with ID {subscriptionTrainerId.Value} is not active.");
+                }
+                break;
+
+                default:
+                throw new ArgumentOutOfRangeException();
+            }
+
             var startDate = now;
             var endDate = now.AddDays(package.Duration);
 
@@ -66,26 +149,15 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
                 startDate,
                 endDate,
                 request.PaymentMethod,
+                subscriptionType,
+                subscriptionTrainerId,
                 package.Description,
                 request.Notes);
 
             await _unitOfWork.Subscriptions.AddAsync(subscription, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new CreateSubscriptionCommandResponse
-            {
-                Id = subscription.Id,
-                CustomerId = subscription.CustomerId,
-                PackageId = subscription.PackageId,
-                PackageName = subscription.PackageName,
-                PackagePrice = subscription.PackagePrice,
-                PackageDuration = subscription.PackageDuration,
-                PackageDescription = subscription.PackageDescription,
-                StartDate = subscription.StartDate,
-                EndDate = subscription.EndDate,
-                PaymentMethod = subscription.PaymentMethod,
-                Notes = subscription.Notes
-            };
+            return _mapper.Map<CreateSubscriptionCommandResponse>(subscription);
         }
     }
 }

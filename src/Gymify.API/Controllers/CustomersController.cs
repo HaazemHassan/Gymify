@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Gymify.API.Common.Constants;
 using Gymify.API.Requests.Customers.ChangeCustomerApprovalStatus;
+using Gymify.API.Requests.Customers.GetCustomerAttendances;
 using Gymify.API.Requests.Customers.GetCustomers;
 using Gymify.API.Requests.Customers.UpdateCustomer;
+using Gymify.Application.Features.Attendances.Queries.GetCustomerAttendances;
 using Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer;
 using Gymify.Application.Features.Customers.Queries.GetCustomerById;
@@ -121,6 +123,29 @@ namespace Gymify.API.Controllers
             command.CustomerId = id;
 
             var result = await Mediator.Send(command, ct);
+
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+        /// <summary>
+        /// Retrieves attendance history for a customer filtered by month and year. Requires AttendanceRead permission or customer self-access.
+        /// </summary>
+        [HttpGet("{id:int}/attendances")]
+        [Authorize]
+        [ProducesResponseType(typeof(GetCustomerAttendancesQueryResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCustomerAttendances(
+            [FromRoute] int id,
+            [FromQuery] GetCustomerAttendancesRequest request,
+            CancellationToken ct)
+        {
+            var query = new GetCustomerAttendancesQuery(id, request.Month, request.Year);
+            var result = await Mediator.Send(query, ct);
 
             if (result.IsError)
             {

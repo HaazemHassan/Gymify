@@ -1,14 +1,18 @@
 using Gymify.Application.Common.CQRS;
 using Gymify.Application.Security;
 using Gymify.Application.Security.Markers;
+using Gymify.Application.Security.Policies;
 using Gymify.Domain.Common.Enums;
 
 namespace Gymify.Application.Features.Trainers.Queries.GetTrainerById
 {
     [Authorize(Permissions = [Permission.TrainersRead])]
-    public class GetTrainerByIdQuery : IQuery<GetTrainerByIdQueryResponse>, IAuthorizedRequest
+    [Authorize(Policy = AuthorizationPolicies.SelfTrainerOnly)]
+    public class GetTrainerByIdQuery : IQuery<GetTrainerByIdQueryResponse>, ITrainerResourceRequest
     {
         public int Id { get; set; }
+
+        public int TrainerId => Id;
 
         public GetTrainerByIdQuery(int id)
         {

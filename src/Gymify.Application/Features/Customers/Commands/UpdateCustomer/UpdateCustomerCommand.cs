@@ -1,4 +1,3 @@
-using Gymify.Application.Common.CQRS;
 using Gymify.Application.Security;
 using Gymify.Application.Security.Markers;
 using Gymify.Domain.Common.Enums;
@@ -6,7 +5,7 @@ using Gymify.Domain.Common.Enums;
 namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
 {
     [Authorize(Permissions = [Permission.CustomersWrite])]
-    public class UpdateCustomerCommand : ICommand<UpdateCustomerCommandResponse>, IAuthorizedRequest
+    public class UpdateCustomerCommand : ICommand<UpdateCustomerCommandResponse>, ICustomerResourceRequest
     {
         public int CustomerId { get; set; }
 

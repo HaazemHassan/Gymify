@@ -47,8 +47,14 @@ namespace Gymify.Application
 
         private static void AddAuthorizationPolicies(IServiceCollection services)
         {
-            services.AddScoped<IAuthorizationPolicy, SelfOrAdminPolicy>();
-            services.AddScoped<IAuthorizationPolicy, SelfOnlyPolicy>();
+            var assembly = typeof(ApplicationAssemblyMarker).Assembly;
+            var policyTypes = assembly.GetTypes()
+                .Where(t => typeof(IAuthorizationPolicy).IsAssignableFrom(t) && t is { IsClass: true, IsAbstract: false });
+
+            foreach (var type in policyTypes)
+            {
+                services.AddScoped(typeof(IAuthorizationPolicy), type);
+            }
         }
 
         private static void AddCachePolicies(IServiceCollection services, Type openGenericPolicyInterface)

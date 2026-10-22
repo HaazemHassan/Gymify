@@ -1,9 +1,13 @@
 using AutoMapper;
 using Gymify.API.Requests.Attendances.CheckIn;
 using Gymify.API.Requests.Attendances.CheckOut;
+using Gymify.API.Requests.Attendances.GetAttendances;
+using Gymify.Application.Common.Pagination;
 using Gymify.Application.Features.Attendances.Commands.CheckIn;
 using Gymify.Application.Features.Attendances.Commands.CheckOut;
+using Gymify.Application.Features.Attendances.Queries.GetAttendances;
 using Gymify.Application.Features.Attendances.Queries.GetCurrentGymOccupancy;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
@@ -15,6 +19,25 @@ namespace Gymify.API.Controllers
         public AttendancesController(IMapper mapper)
         {
             _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Retrieves attendance records with pagination, search, currently-attending filter, and date filters. Requires AttendanceRead permission.
+        /// </summary>
+        [HttpGet]
+        [Authorize]
+        [ProducesResponseType(typeof(PaginatedResult<GetAttendancesQueryResponse>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAttendances([FromQuery] GetAttendancesRequest request, CancellationToken ct)
+        {
+            var query = _mapper.Map<GetAttendancesQuery>(request);
+            var result = await Mediator.Send(query, ct);
+
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
         }
 
         /// <summary>

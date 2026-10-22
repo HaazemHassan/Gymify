@@ -14,5 +14,19 @@ namespace Gymify.Application.Common.Helpers
                 _ => now.Date
             };
         }
+
+        public static (DateTimeOffset Start, DateTimeOffset End) GetMonthDateRange(int year, int month)
+        {
+            var start = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
+            var end = start.AddMonths(1);
+            return (start, end);
+        }
+
+        public static (DateTimeOffset Start, DateTimeOffset End) GetYearDateRange(int year)
+        {
+            var start = new DateTimeOffset(year, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var end = start.AddYears(1);
+            return (start, end);
+        }
     }
 }

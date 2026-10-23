@@ -138,7 +138,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                             _ => UserType.Customer
                         };
 
-                    var domainUser = new DomainUser(
+                    var domainUser = DomainUser.Create(
                         userType,
                         userData.Name,
                         userData.Email,
@@ -146,7 +146,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         userData.IsActive
                     );
 
-                    var result = await _applicationUserService.AddUser(domainUser, userData.Password, cancellationToken);
+                    var result = await _applicationUserService.AddUser(domainUser, userData.Password, emailConfirmed: true, cancellationToken);
 
                     if (result.IsError)
                     {

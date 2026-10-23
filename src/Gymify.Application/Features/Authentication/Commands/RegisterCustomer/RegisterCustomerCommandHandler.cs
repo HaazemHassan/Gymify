@@ -58,7 +58,7 @@ namespace Gymify.Application.Features.Authentication.Commands.RegisterCustomer
                 }
 
 
-                existingDomainUser.UpdateInfo(request.Name, normalizedPhone);
+                existingDomainUser.ReRegister(request.Name, normalizedPhone);
                 domainUser = existingDomainUser;
 
                 var updateResult = await _applicationUserService.UpdateUnconfirmedUserAsync(domainUser, request.Password, cancellationToken);
@@ -80,14 +80,13 @@ namespace Gymify.Application.Features.Authentication.Commands.RegisterCustomer
                 }
 
 
-                domainUser = new DomainUser(
-                    UserType.Customer,
+                domainUser = DomainUser.Register(
                     request.Name,
                     request.Email,
                     normalizedPhone
                 );
 
-                var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, cancellationToken);
+                var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, emailConfirmed: false, ct: cancellationToken);
                 if (addUserResult.IsError)
                 {
                     return addUserResult.Errors;

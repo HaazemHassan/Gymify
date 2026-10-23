@@ -12,6 +12,7 @@ public static class ErrorCodes
     public static class Customer
     {
         public const string CustomerNotFound = "CUSTOMER_NOT_FOUND";
+        public const string CodeAlreadyExists = "CUSTOMER_CODE_ALREADY_EXISTS";
     }
 
     public static class Package

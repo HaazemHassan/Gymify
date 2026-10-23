@@ -28,6 +28,7 @@ namespace Gymify.Infrastructure.Services
         public async Task<ErrorOr<int>> AddUser(
              DomainUser domainUser,
              string password,
+             bool emailConfirmed = false,
              CancellationToken ct = default)
         {
             var isAuthUserLinked = await _userManager.Users.AnyAsync(au => au.DomainUserId == domainUser.Id || au.Email == domainUser.Email, ct);
@@ -56,6 +57,10 @@ namespace Gymify.Infrastructure.Services
 
             var applicationUser = new ApplicationUser(domainUser.Email, domainUser.PhoneNumber);
             applicationUser.LinkToDomainUser(domainUser);
+            if (emailConfirmed)
+            {
+                applicationUser.EmailConfirmed = true;
+            }
 
             var result = await _userManager.CreateAsync(applicationUser, password);
 

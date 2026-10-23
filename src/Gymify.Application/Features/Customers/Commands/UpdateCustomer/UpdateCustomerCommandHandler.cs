@@ -55,6 +55,20 @@ namespace Gymify.Application.Features.Customers.Commands.UpdateCustomer
                 customer.DomainUser.SetActive(request.IsActive.Value);
             }
 
+            if (!string.IsNullOrWhiteSpace(request.Code) && request.Code != customer.Code)
+            {
+                var codeExists = await _unitOfWork.Customers.AnyAsync(
+                    c => c.Code == request.Code && c.Id != customer.Id,
+                    cancellationToken);
+
+                if (codeExists)
+                {
+                    return Error.Conflict(
+                        code: ErrorCodes.Customer.CodeAlreadyExists,
+                        description: "Customer code already exists.");
+                }
+            }
+
             customer.UpdateDetails(
                 height: request.Height,
                 weight: request.Weight,

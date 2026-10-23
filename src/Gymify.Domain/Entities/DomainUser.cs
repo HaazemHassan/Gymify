@@ -10,19 +10,54 @@ namespace Gymify.Domain.Entities
         {
         }
 
-        public DomainUser(UserType userType,
+        private DomainUser(
+            UserType userType,
             string name,
             string email,
             string? phoneNumber = default,
-            bool isActive = true
-            )
+            bool isActive = true)
         {
             UserType = userType;
             Name = name;
             Email = email;
             PhoneNumber = phoneNumber;
             IsActive = isActive;
+        }
 
+        public static DomainUser Register(
+            string name,
+            string email,
+            string? phoneNumber = default)
+        {
+            var user = new DomainUser(
+                userType: UserType.Customer,
+                name: name,
+                email: email,
+                phoneNumber: phoneNumber,
+                isActive: true);
+
+            user.RaiseDomainEvent(new UserRegisteredDomainEvent(user.Email));
+            return user;
+        }
+
+        public static DomainUser Create(
+            UserType userType,
+            string name,
+            string email,
+            string? phoneNumber = default,
+            bool isActive = true)
+        {
+            return new DomainUser(
+                userType: userType,
+                name: name,
+                email: email,
+                phoneNumber: phoneNumber,
+                isActive: isActive);
+        }
+
+        public void ReRegister(string? name = null, string? phoneNumber = null)
+        {
+            UpdateInfo(name, phoneNumber);
             RaiseDomainEvent(new UserRegisteredDomainEvent(Email));
         }
 

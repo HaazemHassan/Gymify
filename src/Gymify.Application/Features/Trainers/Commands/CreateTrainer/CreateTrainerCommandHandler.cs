@@ -44,14 +44,14 @@ namespace Gymify.Application.Features.Trainers.Commands.CreateTrainer
                     description: "Phone number already exists.");
             }
 
-            var domainUser = new DomainUser(
+            var domainUser = DomainUser.Create(
                 UserType.Employee,
                 request.Name,
                 request.Email,
                 normalizedPhone,
                 request.IsActive);
 
-            var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, cancellationToken);
+            var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, emailConfirmed: true, cancellationToken);
             if (addUserResult.IsError)
             {
                 return addUserResult.Errors;

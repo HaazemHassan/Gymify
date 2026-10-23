@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Gymify.API.Common.Constants;
 using Gymify.API.Requests.Customers.ChangeCustomerApprovalStatus;
+using Gymify.API.Requests.Customers.CreateCustomer;
 using Gymify.API.Requests.Customers.CreateCustomerBehaviorNote;
 using Gymify.API.Requests.Customers.GetCustomerAttendances;
 using Gymify.API.Requests.Customers.GetCustomerBehaviorNotes;
@@ -13,6 +14,7 @@ using Gymify.Application.Features.Attendances.Queries.GetCustomerAttendances;
 using Gymify.Application.Features.CustomerBehaviorNotes.Commands.CreateCustomerBehaviorNote;
 using Gymify.Application.Features.CustomerBehaviorNotes.Queries.GetCustomerBehaviorNotes;
 using Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus;
+using Gymify.Application.Features.Customers.Commands.CreateCustomer;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer;
 using Gymify.Application.Features.Customers.Queries.GetCustomerById;
 using Gymify.Application.Features.Customers.Queries.GetCustomerMe;
@@ -28,6 +30,27 @@ namespace Gymify.API.Controllers
         public CustomersController(IMapper mapper)
         {
             _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Creates a new customer with user account and health profile. Requires CustomersWrite permission.
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        [ProducesResponseType(typeof(CreateCustomerCommandResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerRequest request, CancellationToken ct)
+        {
+            var command = _mapper.Map<CreateCustomerCommand>(request);
+            var result = await Mediator.Send(command, ct);
+
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return CreatedAtRoute(RouteNames.Customers.GetCustomerById, new { id = result.Value.CustomerId }, result.Value);
         }
 
         /// <summary>

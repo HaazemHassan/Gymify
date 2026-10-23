@@ -6,7 +6,7 @@ namespace Gymify.Application.ServicesContracts.Infrastructure
 {
     public interface IApplicationUserService
     {
-        Task<ErrorOr<int>> AddUser(DomainUser user, string password, CancellationToken ct = default);
+        Task<ErrorOr<int>> AddUser(DomainUser user, string password, bool emailConfirmed = false, CancellationToken ct = default);
         Task<ErrorOr<Success>> AssignRoleAsync(int userId, UserRole role, CancellationToken ct = default);
         Task<ErrorOr<UserBaseResponse>> GetUserAuthProfileAsync(int domainUserId, CancellationToken ct = default);
         Task<bool> IsEmailConfirmedAsync(int domainUserId, CancellationToken ct = default);

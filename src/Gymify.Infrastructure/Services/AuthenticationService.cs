@@ -210,7 +210,7 @@ namespace Gymify.Infrastructure.Services
         {
             const string googleProvider = "Google";
 
-            var domainUser = new DomainUser(
+            var domainUser = DomainUser.Create(
                 userType: userType,
                 name: googleUser.Name,
                 email: googleUser.Email

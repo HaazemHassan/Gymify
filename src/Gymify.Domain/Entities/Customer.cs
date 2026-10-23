@@ -14,12 +14,26 @@ namespace Gymify.Domain.Entities
             int domainUserId,
             double? height = default,
             double? weight = default,
-            ApprovalStatus approvalStatus = ApprovalStatus.Pending)
+            ApprovalStatus approvalStatus = ApprovalStatus.Pending,
+            int? age = default,
+            string? code = default,
+            string? injuries = default,
+            string? chronicDiseases = default,
+            double? musclePercentage = default,
+            double? fatPercentage = default,
+            string? notes = default)
         {
             DomainUserId = domainUserId;
             Height = height;
             Weight = weight;
             ApprovalStatus = approvalStatus;
+            Age = age;
+            Code = code;
+            Injuries = injuries;
+            ChronicDiseases = chronicDiseases;
+            MusclePercentage = musclePercentage;
+            FatPercentage = fatPercentage;
+            Notes = notes;
         }
 
         public int DomainUserId { get; private set; }

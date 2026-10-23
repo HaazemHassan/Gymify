@@ -9,7 +9,6 @@ namespace Gymify.Application.Features.Customers.Queries.GetCustomerMe
         {
             CreateMap<Customer, GetCustomerMeQueryResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.DomainUserId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.DomainUser != null ? src.DomainUser.Name : string.Empty))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.DomainUser != null ? src.DomainUser.Email : string.Empty))

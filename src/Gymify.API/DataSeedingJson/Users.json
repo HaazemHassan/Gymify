@@ -25,7 +25,7 @@
     "PhoneNumber": "01234567894",
     "Address": "Cairo, Egypt",
     "Password": "12345678Hh",
-    "Role": "Manager",
+    "Role": "OperationManager",
     "UserType": "Employee",
     "Salary": 10000
   },

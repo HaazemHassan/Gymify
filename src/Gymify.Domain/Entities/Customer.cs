@@ -38,6 +38,7 @@ namespace Gymify.Domain.Entities
 
         public ICollection<Subscription> Subscriptions { get; private set; } = new List<Subscription>();
         public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
+        public ICollection<CustomerBehaviorNote> CustomerBehaviorNotes { get; private set; } = new List<CustomerBehaviorNote>();
 
         public void UpdatePhysicalAttributes(double? height, double? weight)
         {

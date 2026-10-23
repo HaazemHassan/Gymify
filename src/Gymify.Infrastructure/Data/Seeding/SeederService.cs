@@ -134,7 +134,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         {
                             UserRole.SuperAdmin => UserType.SuperAdmin,
                             UserRole.Customer => UserType.Customer,
-                            UserRole.Trainer or UserRole.Manager or UserRole.Gator or UserRole.Reception => UserType.Employee,
+                            UserRole.Trainer or UserRole.OperationManager or UserRole.Gator or UserRole.Reception => UserType.Employee,
                             _ => UserType.Customer
                         };
 
@@ -174,7 +174,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                         await _unitOfWork.Customers.AddAsync(customer, cancellationToken);
                         await _unitOfWork.SaveChangesAsync(cancellationToken);
                     }
-                    else if (userType == UserType.Employee || userData.Role is UserRole.Trainer or UserRole.Manager or UserRole.Gator or UserRole.Reception)
+                    else if (userType == UserType.Employee || userData.Role is UserRole.Trainer or UserRole.OperationManager or UserRole.Gator or UserRole.Reception)
                     {
                         var employee = new Employee(
                             domainUserId: domainUser.Id,

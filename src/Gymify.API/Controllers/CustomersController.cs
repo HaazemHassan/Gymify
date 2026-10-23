@@ -3,10 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Gymify.API.Common.Constants;
 using Gymify.API.Requests.Customers.ChangeCustomerApprovalStatus;
+using Gymify.API.Requests.Customers.CreateCustomerBehaviorNote;
 using Gymify.API.Requests.Customers.GetCustomerAttendances;
+using Gymify.API.Requests.Customers.GetCustomerBehaviorNotes;
 using Gymify.API.Requests.Customers.GetCustomers;
 using Gymify.API.Requests.Customers.UpdateCustomer;
+using Gymify.Application.Common.Pagination;
 using Gymify.Application.Features.Attendances.Queries.GetCustomerAttendances;
+using Gymify.Application.Features.CustomerBehaviorNotes.Commands.CreateCustomerBehaviorNote;
+using Gymify.Application.Features.CustomerBehaviorNotes.Queries.GetCustomerBehaviorNotes;
 using Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer;
 using Gymify.Application.Features.Customers.Queries.GetCustomerById;
@@ -124,6 +129,55 @@ namespace Gymify.API.Controllers
 
             var result = await Mediator.Send(command, ct);
 
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+        /// <summary>
+        /// Creates a behavior note for the specified customer. Allowed for CustomerBehaviorWrite or CustomersWrite permissions.
+        /// </summary>
+        [HttpPost("{id:int}/behavior-notes")]
+        [Authorize]
+        [ProducesResponseType(typeof(CreateCustomerBehaviorNoteCommandResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreateCustomerBehaviorNote(
+            [FromRoute] int id,
+            [FromBody] CreateCustomerBehaviorNoteRequest request,
+            CancellationToken ct)
+        {
+            var command = _mapper.Map<CreateCustomerBehaviorNoteCommand>(request);
+            command.CustomerId = id;
+
+            var result = await Mediator.Send(command, ct);
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+        /// <summary>
+        /// Retrieves paginated behavior notes for the specified customer. Requires CustomersRead permission.
+        /// </summary>
+        [HttpGet("{id:int}/behavior-notes")]
+        [Authorize]
+        [ProducesResponseType(typeof(PaginatedResult<GetCustomerBehaviorNotesQueryResponse>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCustomerBehaviorNotes(
+            [FromRoute] int id,
+            [FromQuery] GetCustomerBehaviorNotesRequest request,
+            CancellationToken ct)
+        {
+            var query = _mapper.Map<GetCustomerBehaviorNotesQuery>(request);
+            query.CustomerId = id;
+
+            var result = await Mediator.Send(query, ct);
             if (result.IsError)
             {
                 return Problem(result.Errors);

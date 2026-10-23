@@ -20,11 +20,14 @@ namespace Gymify.Infrastructure.Data
         public DbSet<Trainer> Trainers => Set<Trainer>();
         public DbSet<Locker> Lockers => Set<Locker>();
         public DbSet<Attendance> Attendances => Set<Attendance>();
+        public DbSet<CustomerBehaviorNote> CustomerBehaviorNotes => Set<CustomerBehaviorNote>();
         public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<VerificationCode> VerificationCodes => Set<VerificationCode>();
         public DbSet<IdempotentRequest> IdempotentRequests => Set<IdempotentRequest>();
+        public DbSet<Kpi> Kpis => Set<Kpi>();
+        public DbSet<TrainerKpiScore> TrainerKpiScores => Set<TrainerKpiScore>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

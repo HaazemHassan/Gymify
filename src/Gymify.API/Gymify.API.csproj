@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\Models\**" />
+    <Content Remove="Common\Models\**" />
+    <EmbeddedResource Remove="Common\Models\**" />
+    <None Remove="Common\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
@@ -26,10 +33,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Gymify.Application\Gymify.Application.csproj" />
     <ProjectReference Include="..\Gymify.Infrastructure\Gymify.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Common\Models\" />
   </ItemGroup>
 
   <ItemGroup>

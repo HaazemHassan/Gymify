@@ -177,7 +177,10 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ITrainerRepository, TrainerRepository>();
         services.AddScoped<ILockerRepository, LockerRepository>();
         services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+        services.AddScoped<ICustomerBehaviorNoteRepository, CustomerBehaviorNoteRepository>();
         services.AddScoped<IVerificationCodeRepository, VerificationCodeRepository>();
+        services.AddScoped<IKpiRepository, KpiRepository>();
+        services.AddScoped<ITrainerKpiScoreRepository, TrainerKpiScoreRepository>();
 
         return services;
     }

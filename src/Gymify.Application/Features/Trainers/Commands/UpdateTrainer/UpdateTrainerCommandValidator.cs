@@ -1,5 +1,6 @@
 using FluentValidation;
 using Gymify.Application.Common;
+using Gymify.Application.Features.Trainers.Shared;
 using Gymify.Application.Features.Users.Shared;
 using Gymify.Application.ServicesContracts.Infrastructure;
 
@@ -35,16 +36,12 @@ namespace Gymify.Application.Features.Trainers.Commands.UpdateTrainer
 
             When(x => x.YearsOfExperience.HasValue, () =>
             {
-                RuleFor(x => x.YearsOfExperience!.Value)
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("Years of experience cannot be negative.");
+                RuleFor(x => x.YearsOfExperience!.Value).ApplyYearsOfExperienceRules();
             });
 
             When(x => x.Salary.HasValue, () =>
             {
-                RuleFor(x => x.Salary!.Value)
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("Salary cannot be negative.");
+                RuleFor(x => x.Salary!.Value).ApplySalaryRules();
             });
         }
 

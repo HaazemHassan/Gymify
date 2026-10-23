@@ -102,4 +102,18 @@ public static class ErrorCodes
         public const string PaymentIntentCreationFailed = "PAYMENT_INTENT_CREATION_FAILED";
         public const string TransactionAlreadyProcessed = "PAYMENT_TRANSACTION_ALREADY_PROCESSED";
     }
+
+    public static class Kpi
+    {
+        public const string KpiNotFound = "KPI_NOT_FOUND";
+        public const string KpiNameAlreadyExists = "KPI_NAME_ALREADY_EXISTS";
+    }
+
+    public static class TrainerKpi
+    {
+        public const string AlreadyEvaluatedToday = "TRAINER_KPI_ALREADY_EVALUATED_TODAY";
+        public const string ScoreNotFound = "TRAINER_KPI_SCORE_NOT_FOUND";
+        public const string InvalidScore = "TRAINER_KPI_INVALID_SCORE";
+        public const string DuplicateKpiInSubmission = "TRAINER_KPI_DUPLICATE_KPI_IN_SUBMISSION";
+    }
 }

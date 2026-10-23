@@ -15,8 +15,11 @@ internal sealed class UnitOfWork(
     ILockerRepository lockers,
     IAttendanceRepository attendances,
     ISubscriptionRepository subscriptions,
+    ICustomerBehaviorNoteRepository customerBehaviorNotes,
     IRefreshTokenRepository refreshTokens,
-    IVerificationCodeRepository verificationCodes)
+    IVerificationCodeRepository verificationCodes,
+    IKpiRepository kpis,
+    ITrainerKpiScoreRepository trainerKpiScores)
     : IUnitOfWork
 {
     private readonly AppDbContext _context = context;
@@ -29,8 +32,11 @@ internal sealed class UnitOfWork(
     public ILockerRepository Lockers { get; } = lockers;
     public IAttendanceRepository Attendances { get; } = attendances;
     public ISubscriptionRepository Subscriptions { get; } = subscriptions;
+    public ICustomerBehaviorNoteRepository CustomerBehaviorNotes { get; } = customerBehaviorNotes;
     public IRefreshTokenRepository RefreshTokens { get; } = refreshTokens;
     public IVerificationCodeRepository VerificationCodes { get; } = verificationCodes;
+    public IKpiRepository Kpis { get; } = kpis;
+    public ITrainerKpiScoreRepository TrainerKpiScores { get; } = trainerKpiScores;
 
     private IDbContextTransaction? _transaction;
 

@@ -25,6 +25,7 @@ namespace Gymify.Domain.Entities
         public bool IsActive { get; private set; } = true;
 
         public Trainer? Trainer { get; private set; }
+        public ICollection<CustomerBehaviorNote> CustomerBehaviorNotes { get; private set; } = new List<CustomerBehaviorNote>();
 
         public void UpdateSalary(decimal salary)
         {

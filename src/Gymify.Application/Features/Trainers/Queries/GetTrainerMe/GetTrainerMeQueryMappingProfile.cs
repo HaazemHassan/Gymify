@@ -3,13 +3,12 @@ using Gymify.Domain.Entities;
 
 namespace Gymify.Application.Features.Trainers.Queries.GetTrainerMe
 {
-    public class TrainerMeMappingProfile : Profile
+    public class GetTrainerMeQueryMappingProfile : Profile
     {
-        public TrainerMeMappingProfile()
+        public GetTrainerMeQueryMappingProfile()
         {
             CreateMap<Trainer, GetTrainerMeQueryResponse>()
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.Id))
-                .ForMember(d => d.TrainerId, opt => opt.MapFrom(s => s.Id))
                 .ForMember(d => d.EmployeeId, opt => opt.MapFrom(s => s.EmployeeId))
                 .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Employee.DomainUserId))
                 .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Employee.DomainUser.Name))

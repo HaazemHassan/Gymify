@@ -13,8 +13,11 @@ public interface IUnitOfWork
     ILockerRepository Lockers { get; }
     IAttendanceRepository Attendances { get; }
     ISubscriptionRepository Subscriptions { get; }
+    ICustomerBehaviorNoteRepository CustomerBehaviorNotes { get; }
     IRefreshTokenRepository RefreshTokens { get; }
     IVerificationCodeRepository VerificationCodes { get; }
+    IKpiRepository Kpis { get; }
+    ITrainerKpiScoreRepository TrainerKpiScores { get; }
 
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

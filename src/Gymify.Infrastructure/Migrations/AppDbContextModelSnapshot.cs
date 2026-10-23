@@ -163,6 +163,55 @@ namespace Gymify.Infrastructure.Migrations
                     b.ToTable("Customers", "users");
                 });
 
+            modelBuilder.Entity("Gymify.Domain.Entities.CustomerBehaviorNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId", "CreatedAt");
+
+                    b.HasIndex("EmployeeId", "CreatedAt");
+
+                    b.ToTable("CustomerBehaviorNotes", "gym");
+                });
+
             modelBuilder.Entity("Gymify.Domain.Entities.DomainUser", b =>
                 {
                     b.Property<int>("Id")
@@ -270,6 +319,58 @@ namespace Gymify.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Employees", "staff");
+                });
+
+            modelBuilder.Entity("Gymify.Domain.Entities.Kpi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Kpis", "staff");
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.Locker", b =>
@@ -565,6 +666,65 @@ namespace Gymify.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Trainers", "staff");
+                });
+
+            modelBuilder.Entity("Gymify.Domain.Entities.TrainerKpiScore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KpiId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Score")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("decimal(4,2)");
+
+                    b.Property<int>("TrainerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KpiId");
+
+                    b.HasIndex("TrainerId", "Date");
+
+                    b.HasIndex("TrainerId", "KpiId", "Date")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("TrainerKpiScores", "staff");
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.VerificationCode", b =>
@@ -913,6 +1073,25 @@ namespace Gymify.Infrastructure.Migrations
                     b.Navigation("DomainUser");
                 });
 
+            modelBuilder.Entity("Gymify.Domain.Entities.CustomerBehaviorNote", b =>
+                {
+                    b.HasOne("Gymify.Domain.Entities.Customer", "Customer")
+                        .WithMany("CustomerBehaviorNotes")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Gymify.Domain.Entities.Employee", "Employee")
+                        .WithMany("CustomerBehaviorNotes")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Gymify.Domain.Entities.Employee", b =>
                 {
                     b.HasOne("Gymify.Domain.Entities.DomainUser", "DomainUser")
@@ -978,6 +1157,25 @@ namespace Gymify.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Gymify.Domain.Entities.TrainerKpiScore", b =>
+                {
+                    b.HasOne("Gymify.Domain.Entities.Kpi", "Kpi")
+                        .WithMany()
+                        .HasForeignKey("KpiId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Gymify.Domain.Entities.Trainer", "Trainer")
+                        .WithMany()
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kpi");
+
+                    b.Navigation("Trainer");
                 });
 
             modelBuilder.Entity("Gymify.Infrastructure.Data.Identity.Entities.ApplicationUser", b =>
@@ -1056,6 +1254,8 @@ namespace Gymify.Infrastructure.Migrations
                 {
                     b.Navigation("Attendances");
 
+                    b.Navigation("CustomerBehaviorNotes");
+
                     b.Navigation("Subscriptions");
                 });
 
@@ -1068,6 +1268,8 @@ namespace Gymify.Infrastructure.Migrations
 
             modelBuilder.Entity("Gymify.Domain.Entities.Employee", b =>
                 {
+                    b.Navigation("CustomerBehaviorNotes");
+
                     b.Navigation("Trainer");
                 });
 

@@ -3,7 +3,6 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainerMe
     public class GetTrainerMeQueryResponse
     {
         public int Id { get; set; }
-        public int TrainerId { get; set; }
         public int EmployeeId { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; } = string.Empty;

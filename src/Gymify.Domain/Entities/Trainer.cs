@@ -17,6 +17,13 @@ namespace Gymify.Domain.Entities
             IsActive = isActive;
         }
 
+        public Trainer(Employee employee, int yearsOfExperience = 0, bool isActive = true)
+        {
+            Employee = employee;
+            YearsOfExperience = yearsOfExperience;
+            IsActive = isActive;
+        }
+
         public int EmployeeId { get; private set; }
         public Employee Employee { get; private set; } = null!;
         public int YearsOfExperience { get; private set; }

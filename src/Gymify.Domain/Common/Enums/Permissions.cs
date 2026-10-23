@@ -17,6 +17,7 @@ namespace Gymify.Domain.Common.Enums
         CustomersRead = 14,
         CustomersWrite = 15,
         TrainersRead = 16,
-        TrainersWrite = 17
+        TrainersWrite = 17,
+        CustomerBehaviorWrite = 18
     }
 }

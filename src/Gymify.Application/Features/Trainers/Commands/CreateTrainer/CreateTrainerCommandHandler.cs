@@ -65,13 +65,12 @@ namespace Gymify.Application.Features.Trainers.Commands.CreateTrainer
 
             var employee = new Employee(
                 domainUserId: domainUser.Id,
-                salary: request.Salary,
-                isActive: request.IsActive);
+                salary: request.Salary);
 
             var trainer = new Trainer(
                 employee: employee,
                 yearsOfExperience: request.YearsOfExperience,
-                isActive: request.IsActive);
+                isAvailable: request.IsAvailable);
 
             await _unitOfWork.Employees.AddAsync(employee, cancellationToken);
             await _unitOfWork.Trainers.AddAsync(trainer, cancellationToken);

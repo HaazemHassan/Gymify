@@ -21,7 +21,7 @@ namespace Gymify.Application.Features.Attendances.Commands.CheckOut
 
         public async Task<ErrorOr<CheckOutCommandResponse>> Handle(CheckOutCommand request, CancellationToken cancellationToken)
         {
-            var customerSpec = new CustomerByCodeSpec(request.Code);
+            var customerSpec = new ActiveCustomerByCodeSpec(request.Code);
             var customer = await _unitOfWork.Customers.FirstOrDefaultAsync(customerSpec, cancellationToken);
             if (customer is null)
             {

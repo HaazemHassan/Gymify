@@ -6,5 +6,6 @@ namespace Gymify.Application.Security.Policies
         public const string SelfOnly = nameof(SelfOnly);
         public const string SelfCustomerOnly = nameof(SelfCustomerOnly);
         public const string SelfTrainerOnly = nameof(SelfTrainerOnly);
+        public const string SelfSubscriptionOnly = nameof(SelfSubscriptionOnly);
     }
 }

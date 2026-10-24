@@ -178,8 +178,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                     {
                         var employee = new Employee(
                             domainUserId: domainUser.Id,
-                            salary: userData.Salary ?? 0m,
-                            isActive: true);
+                            salary: userData.Salary ?? 0m);
 
                         await _unitOfWork.Employees.AddAsync(employee, cancellationToken);
                         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -189,7 +188,7 @@ namespace Gymify.Infrastructure.Data.Seeding
                             var trainer = new Trainer(
                                 employeeId: employee.Id,
                                 yearsOfExperience: userData.YearsOfExperience ?? 0,
-                                isActive: true);
+                                isAvailable: true);
 
                             await _unitOfWork.Trainers.AddAsync(trainer, cancellationToken);
                             await _unitOfWork.SaveChangesAsync(cancellationToken);

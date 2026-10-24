@@ -16,5 +16,6 @@ namespace Gymify.Application.Features.Trainers.Commands.CreateTrainer
         public decimal Salary { get; set; }
         public int YearsOfExperience { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool IsAvailable { get; set; } = true;
     }
 }

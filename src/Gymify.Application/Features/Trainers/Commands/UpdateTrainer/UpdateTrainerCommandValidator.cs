@@ -58,7 +58,8 @@ namespace Gymify.Application.Features.Trainers.Commands.UpdateTrainer
                    command.PhoneNumber != null ||
                    command.YearsOfExperience.HasValue ||
                    command.Salary.HasValue ||
-                   command.IsActive.HasValue;
+                   command.IsActive.HasValue ||
+                   command.IsAvailable.HasValue;
         }
     }
 }

@@ -10,5 +10,6 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainersForManagement
     public class GetTrainersForManagementQuery : PaginatedQuery, IQuery<PaginatedResult<GetTrainersForManagementQueryResponse>>, IAuthorizedRequest
     {
         public bool? IsActive { get; set; }
+        public bool? IsAvailable { get; set; }
     }
 }

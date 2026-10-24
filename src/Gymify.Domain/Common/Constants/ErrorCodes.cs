@@ -36,6 +36,7 @@ public static class ErrorCodes
     {
         public const string TrainerNotFound = "TRAINER_NOT_FOUND";
         public const string TrainerInactive = "TRAINER_INACTIVE";
+        public const string TrainerUnavailable = "TRAINER_UNAVAILABLE";
         public const string InvalidExperience = "TRAINER_INVALID_EXPERIENCE";
     }
 
@@ -48,6 +49,8 @@ public static class ErrorCodes
         public const string AttendanceNotFound = "ATTENDANCE_NOT_FOUND";
         public const string LockerNotAvailable = "ATTENDANCE_LOCKER_NOT_AVAILABLE";
         public const string CustomerHasNoActiveSubscription = "ATTENDANCE_CUSTOMER_HAS_NO_ACTIVE_SUBSCRIPTION";
+        public const string CustomerSubscriptionFrozen = "ATTENDANCE_CUSTOMER_SUBSCRIPTION_FROZEN";
+        public const string CustomerSubscriptionCancelled = "ATTENDANCE_CUSTOMER_SUBSCRIPTION_CANCELLED";
     }
 
     public static class Subscription
@@ -58,6 +61,13 @@ public static class ErrorCodes
         public const string TrainerRequired = "SUBSCRIPTION_TRAINER_REQUIRED";
         public const string TrainerMismatch = "SUBSCRIPTION_TRAINER_MISMATCH";
         public const string PackageNotFound = "SUBSCRIPTION_PACKAGE_NOT_FOUND";
+        public const string AlreadyCancelled = "SUBSCRIPTION_ALREADY_CANCELLED";
+        public const string AlreadyExpired = "SUBSCRIPTION_ALREADY_EXPIRED";
+        public const string FreezeOverlap = "SUBSCRIPTION_FREEZE_OVERLAP";
+        public const string InvalidFreezeDates = "SUBSCRIPTION_INVALID_FREEZE_DATES";
+        public const string CannotFreezeCancelled = "SUBSCRIPTION_CANNOT_FREEZE_CANCELLED";
+        public const string CannotFreezeExpired = "SUBSCRIPTION_CANNOT_FREEZE_EXPIRED";
+        public const string NotFrozen = "SUBSCRIPTION_NOT_FROZEN";
     }
 
     public static class Authentication

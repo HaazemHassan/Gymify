@@ -20,7 +20,7 @@ namespace Gymify.Application.Features.Attendances.Commands.CheckIn
 
         public async Task<ErrorOr<CheckInCommandResponse>> Handle(CheckInCommand request, CancellationToken cancellationToken)
         {
-            var customerSpec = new CustomerByCodeSpec(request.Code);
+            var customerSpec = new ActiveCustomerByCodeSpec(request.Code);
             var customer = await _unitOfWork.Customers.FirstOrDefaultAsync(customerSpec, cancellationToken);
             if (customer is null)
             {
@@ -31,19 +31,45 @@ namespace Gymify.Application.Features.Attendances.Commands.CheckIn
 
             var now = _dateTimeProvider.UtcNow;
 
-            var latestSubscription = await _unitOfWork.Subscriptions.FirstOrDefaultAsync(
-                new LatestSubscriptionByCustomerIdSpec(customer.Id), cancellationToken);
+            var activeSubscription = await _unitOfWork.Subscriptions.FirstOrDefaultAsync(
+                new CustomerActiveSubscriptionSpec(customer.Id, now), cancellationToken);
 
-            var isExpired = latestSubscription == null || latestSubscription.EndDate < now;
-            var hasActiveSubscription = latestSubscription != null && latestSubscription.IsActive(now);
-
-            if (!hasActiveSubscription)
+            if (activeSubscription is null)
             {
+                var latestSubscription = await _unitOfWork.Subscriptions.FirstOrDefaultAsync(
+                    new LatestSubscriptionByCustomerIdSpec(customer.Id), cancellationToken);
+
+                if (latestSubscription is null)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Attendance.CustomerHasNoActiveSubscription,
+                        "Customer does not have an active subscription.");
+                }
+
+                if (latestSubscription.IsFrozen(now))
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Attendance.CustomerSubscriptionFrozen,
+                        "Customer subscription is currently frozen.");
+                }
+
+                if (latestSubscription.IsCancelled)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Attendance.CustomerSubscriptionCancelled,
+                        "Customer subscription has been cancelled.");
+                }
+
+                if (now < latestSubscription.StartDate)
+                {
+                    return Error.Conflict(
+                        ErrorCodes.Attendance.CustomerHasNoActiveSubscription,
+                        $"Customer subscription has not started yet. Starts on {latestSubscription.StartDate:yyyy-MM-dd}.");
+                }
+
                 return Error.Conflict(
                     ErrorCodes.Attendance.CustomerHasNoActiveSubscription,
-                    isExpired && latestSubscription != null
-                        ? $"Customer subscription expired on {latestSubscription.EndDate:yyyy-MM-dd}."
-                        : "Customer does not have an active subscription.");
+                    $"Customer subscription expired on {latestSubscription.EndDate:yyyy-MM-dd}.");
             }
 
             // 2. Active attendance check
@@ -99,7 +125,7 @@ namespace Gymify.Application.Features.Attendances.Commands.CheckIn
                 FullName = customer.DomainUser?.Name ?? string.Empty,
                 Email = customer.DomainUser?.Email ?? string.Empty,
                 PhoneNumber = customer.DomainUser?.PhoneNumber,
-                SubscriptionEndDate = latestSubscription?.EndDate,
+                SubscriptionEndDate = activeSubscription.EndDate,
                 LastCheckInAt = lastCheckIn,
                 LockerId = locker.Id,
                 LockerNumber = locker.Number,

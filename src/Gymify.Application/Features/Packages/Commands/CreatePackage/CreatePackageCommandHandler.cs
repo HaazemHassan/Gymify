@@ -28,11 +28,11 @@ namespace Gymify.Application.Features.Packages.Commands.CreatePackage
                         "Trainer was not found.");
                 }
 
-                if (!trainer.IsActive)
+                if (!trainer.IsAvailable)
                 {
                     return Error.Validation(
-                        ErrorCodes.Trainer.TrainerInactive,
-                        "The specified trainer is not active.");
+                        ErrorCodes.Trainer.TrainerUnavailable,
+                        "The specified trainer is not available.");
                 }
             }
 

@@ -295,11 +295,6 @@ namespace Gymify.Infrastructure.Migrations
                     b.Property<int>("DomainUserId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -536,6 +531,13 @@ namespace Gymify.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -553,6 +555,11 @@ namespace Gymify.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("EndDate")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsCancelled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -606,6 +613,8 @@ namespace Gymify.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsCancelled");
+
                     b.HasIndex("PackageId");
 
                     b.HasIndex("TrainerId");
@@ -616,6 +625,55 @@ namespace Gymify.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_Subscriptions_Type_TrainerId", "([Type] = 'Private' AND [TrainerId] IS NOT NULL) OR ([Type] <> 'Private' AND [TrainerId] IS NULL)");
                         });
+                });
+
+            modelBuilder.Entity("Gymify.Domain.Entities.SubscriptionFreeze", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionId", "StartDate", "EndDate");
+
+                    b.ToTable("SubscriptionFreezes", "gym");
                 });
 
             modelBuilder.Entity("Gymify.Domain.Entities.Trainer", b =>
@@ -641,7 +699,7 @@ namespace Gymify.Infrastructure.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsAvailable")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
@@ -1148,6 +1206,17 @@ namespace Gymify.Infrastructure.Migrations
                     b.Navigation("Trainer");
                 });
 
+            modelBuilder.Entity("Gymify.Domain.Entities.SubscriptionFreeze", b =>
+                {
+                    b.HasOne("Gymify.Domain.Entities.Subscription", "Subscription")
+                        .WithMany("Freezes")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
+                });
+
             modelBuilder.Entity("Gymify.Domain.Entities.Trainer", b =>
                 {
                     b.HasOne("Gymify.Domain.Entities.Employee", "Employee")
@@ -1281,6 +1350,11 @@ namespace Gymify.Infrastructure.Migrations
             modelBuilder.Entity("Gymify.Domain.Entities.Package", b =>
                 {
                     b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("Gymify.Domain.Entities.Subscription", b =>
+                {
+                    b.Navigation("Freezes");
                 });
 
             modelBuilder.Entity("Gymify.Infrastructure.Data.Identity.Entities.ApplicationRole", b =>

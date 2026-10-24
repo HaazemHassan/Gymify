@@ -16,7 +16,8 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainerMe
                 .ForMember(d => d.PhoneNumber, opt => opt.MapFrom(s => s.Employee.DomainUser.PhoneNumber))
                 .ForMember(d => d.YearsOfExperience, opt => opt.MapFrom(s => s.YearsOfExperience))
                 .ForMember(d => d.Salary, opt => opt.MapFrom(s => s.Employee.Salary))
-                .ForMember(d => d.IsTrainerActive, opt => opt.MapFrom(s => s.IsActive));
+                .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Employee.DomainUser.IsActive))
+                .ForMember(d => d.IsAvailable, opt => opt.MapFrom(s => s.IsAvailable));
         }
     }
 }

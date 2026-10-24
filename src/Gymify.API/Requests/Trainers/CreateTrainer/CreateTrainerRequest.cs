@@ -10,5 +10,6 @@ namespace Gymify.API.Requests.Trainers.CreateTrainer
         public decimal Salary { get; set; }
         public int YearsOfExperience { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool IsAvailable { get; set; } = true;
     }
 }

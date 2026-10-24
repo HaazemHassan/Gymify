@@ -10,6 +10,7 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainerMe
         public string? PhoneNumber { get; set; }
         public int YearsOfExperience { get; set; }
         public decimal Salary { get; set; }
-        public bool IsTrainerActive { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

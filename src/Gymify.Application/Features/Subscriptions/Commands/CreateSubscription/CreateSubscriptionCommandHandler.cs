@@ -96,11 +96,11 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
                         $"Trainer with ID {subscriptionTrainerId.Value} was not found.");
                 }
 
-                if (!privateTrainer.IsActive)
+                if (!privateTrainer.IsAvailable)
                 {
                     return Error.Conflict(
-                        ErrorCodes.Trainer.TrainerInactive,
-                        $"Trainer with ID {subscriptionTrainerId.Value} is not active.");
+                        ErrorCodes.Trainer.TrainerUnavailable,
+                        $"Trainer with ID {subscriptionTrainerId.Value} is not available.");
                 }
                 break;
 
@@ -125,11 +125,11 @@ namespace Gymify.Application.Features.Subscriptions.Commands.CreateSubscription
                         $"Trainer with ID {subscriptionTrainerId.Value} was not found.");
                 }
 
-                if (!sharedTrainer.IsActive)
+                if (!sharedTrainer.IsAvailable)
                 {
                     return Error.Conflict(
-                        ErrorCodes.Trainer.TrainerInactive,
-                        $"Trainer with ID {subscriptionTrainerId.Value} is not active.");
+                        ErrorCodes.Trainer.TrainerUnavailable,
+                        $"Trainer with ID {subscriptionTrainerId.Value} is not available.");
                 }
                 break;
 

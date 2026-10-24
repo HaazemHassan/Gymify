@@ -8,6 +8,7 @@ namespace Gymify.Application.Features.Attendances.Commands.CheckIn.Specification
         public LatestSubscriptionByCustomerIdSpec(int customerId)
         {
             Query.Where(s => s.CustomerId == customerId)
+                .Include(s => s.Freezes)
                 .OrderByDescending(s => s.EndDate);
         }
     }

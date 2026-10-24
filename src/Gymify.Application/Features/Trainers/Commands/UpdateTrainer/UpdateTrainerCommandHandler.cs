@@ -60,7 +60,12 @@ namespace Gymify.Application.Features.Trainers.Commands.UpdateTrainer
 
             if (request.IsActive.HasValue)
             {
-                trainer.SetActive(request.IsActive.Value);
+                trainer.Employee.DomainUser.SetActive(request.IsActive.Value);
+            }
+
+            if (request.IsAvailable.HasValue)
+            {
+                trainer.SetAvailable(request.IsAvailable.Value);
             }
 
             if (request.YearsOfExperience.HasValue)

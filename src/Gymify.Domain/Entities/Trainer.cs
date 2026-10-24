@@ -10,28 +10,28 @@ namespace Gymify.Domain.Entities
         {
         }
 
-        public Trainer(int employeeId, int yearsOfExperience = 0, bool isActive = true)
+        public Trainer(int employeeId, int yearsOfExperience = 0, bool isAvailable = true)
         {
             EmployeeId = employeeId;
             YearsOfExperience = yearsOfExperience;
-            IsActive = isActive;
+            IsAvailable = isAvailable;
         }
 
-        public Trainer(Employee employee, int yearsOfExperience = 0, bool isActive = true)
+        public Trainer(Employee employee, int yearsOfExperience = 0, bool isAvailable = true)
         {
             Employee = employee;
             YearsOfExperience = yearsOfExperience;
-            IsActive = isActive;
+            IsAvailable = isAvailable;
         }
 
         public int EmployeeId { get; private set; }
         public Employee Employee { get; private set; } = null!;
         public int YearsOfExperience { get; private set; }
-        public bool IsActive { get; private set; } = true;
+        public bool IsAvailable { get; private set; } = true;
 
-        public void SetActive(bool isActive)
+        public void SetAvailable(bool isAvailable)
         {
-            IsActive = isActive;
+            IsAvailable = isAvailable;
         }
 
         public ErrorOr<Success> UpdateExperience(int yearsOfExperience)

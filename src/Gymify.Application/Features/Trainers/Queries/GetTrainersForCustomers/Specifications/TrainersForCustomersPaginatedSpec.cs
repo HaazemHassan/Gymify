@@ -7,7 +7,7 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainersForCustomers.S
     public class TrainersForCustomersPaginatedSpec : TrainersFilteredSpec
     {
         public TrainersForCustomersPaginatedSpec(int pageNumber, int pageSize, string? search = null)
-            : base(search, isActive: true)
+            : base(search, isAvailable: true, isActive: true)
         {
             Query.OrderByDescending(t => t.YearsOfExperience)
                 .ThenBy(t => t.Employee.DomainUser.Name);

@@ -7,12 +7,14 @@ using Gymify.API.Requests.Customers.CreateCustomer;
 using Gymify.API.Requests.Customers.CreateCustomerBehaviorNote;
 using Gymify.API.Requests.Customers.GetCustomerAttendances;
 using Gymify.API.Requests.Customers.GetCustomerBehaviorNotes;
+using Gymify.API.Requests.Customers.GetCustomerSubscriptions;
 using Gymify.API.Requests.Customers.GetCustomers;
 using Gymify.API.Requests.Customers.UpdateCustomer;
 using Gymify.Application.Common.Pagination;
 using Gymify.Application.Features.Attendances.Queries.GetCustomerAttendances;
 using Gymify.Application.Features.CustomerBehaviorNotes.Commands.CreateCustomerBehaviorNote;
 using Gymify.Application.Features.CustomerBehaviorNotes.Queries.GetCustomerBehaviorNotes;
+using Gymify.Application.Features.Subscriptions.Queries.GetCustomerSubscriptions;
 using Gymify.Application.Features.Customers.Commands.ChangeCustomerApprovalStatus;
 using Gymify.Application.Features.Customers.Commands.CreateCustomer;
 using Gymify.Application.Features.Customers.Commands.UpdateCustomer;
@@ -222,6 +224,31 @@ namespace Gymify.API.Controllers
             CancellationToken ct)
         {
             var query = new GetCustomerAttendancesQuery(id, request.Month, request.Year);
+            var result = await Mediator.Send(query, ct);
+
+            if (result.IsError)
+            {
+                return Problem(result.Errors);
+            }
+
+            return Ok(result.Value);
+        }
+
+        /// <summary>
+        /// Retrieves a paginated list of subscriptions for a specific customer. Requires SubscriptionsRead permission.
+        /// </summary>
+        [HttpGet("{id:int}/subscriptions")]
+        [Authorize]
+        [ProducesResponseType(typeof(PaginatedResult<GetCustomerSubscriptionsQueryResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCustomerSubscriptions(
+            [FromRoute] int id,
+            [FromQuery] GetCustomerSubscriptionsRequest request,
+            CancellationToken ct)
+        {
+            var query = _mapper.Map<GetCustomerSubscriptionsQuery>(request);
+            query.CustomerId = id;
+
             var result = await Mediator.Send(query, ct);
 
             if (result.IsError)

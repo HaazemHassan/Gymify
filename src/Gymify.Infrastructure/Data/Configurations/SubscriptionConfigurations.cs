@@ -63,7 +63,20 @@ namespace Gymify.Infrastructure.Data.Configurations
             builder.Property(s => s.Notes)
                 .HasMaxLength(2000);
 
+            builder.Property(s => s.IsCancelled)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(s => s.CancellationReason)
+                .HasMaxLength(500);
+
+            builder.HasMany(s => s.Freezes)
+                .WithOne(f => f.Subscription)
+                .HasForeignKey(f => f.SubscriptionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasIndex(s => new { s.CustomerId, s.EndDate });
+            builder.HasIndex(s => s.IsCancelled);
         }
     }
 }

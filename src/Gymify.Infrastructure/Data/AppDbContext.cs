@@ -16,6 +16,7 @@ namespace Gymify.Infrastructure.Data
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Package> Packages => Set<Package>();
         public DbSet<Subscription> Subscriptions => Set<Subscription>();
+        public DbSet<SubscriptionFreeze> SubscriptionFreezes => Set<SubscriptionFreeze>();
         public DbSet<Employee> Employees => Set<Employee>();
         public DbSet<Trainer> Trainers => Set<Trainer>();
         public DbSet<Locker> Lockers => Set<Locker>();

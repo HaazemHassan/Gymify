@@ -18,8 +18,8 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainersForManagement
 
         public async Task<ErrorOr<PaginatedResult<GetTrainersForManagementQueryResponse>>> Handle(GetTrainersForManagementQuery request, CancellationToken cancellationToken)
         {
-            var dataSpec = new TrainersForManagementPaginatedSpec(request.PageNumber, request.PageSize, request.Search, request.IsActive);
-            var countSpec = new TrainersFilteredSpec(request.Search, isActive: request.IsActive);
+            var dataSpec = new TrainersForManagementPaginatedSpec(request.PageNumber, request.PageSize, request.Search, isAvailable: request.IsAvailable, isActive: request.IsActive);
+            var countSpec = new TrainersFilteredSpec(request.Search, isAvailable: request.IsAvailable, isActive: request.IsActive);
 
             var trainers = await _unitOfWork.Trainers.ListAsync<GetTrainersForManagementQueryResponse>(dataSpec, cancellationToken);
             var totalCount = await _unitOfWork.Trainers.CountAsync(countSpec, cancellationToken);

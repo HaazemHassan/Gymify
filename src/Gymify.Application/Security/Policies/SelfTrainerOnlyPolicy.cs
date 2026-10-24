@@ -32,7 +32,9 @@ namespace Gymify.Application.Security.Policies
 
             var isOwner = _unitOfWork.Trainers
                 .AsQueryable()
-                .Any(t => t.Id == trainerResourceRequest.TrainerId && t.Employee.DomainUserId == currentUserId);
+                .Any(t => t.Id == trainerResourceRequest.TrainerId 
+                       && t.Employee.DomainUserId == currentUserId
+                       && t.Employee.DomainUser.IsActive);
 
             if (isOwner)
             {

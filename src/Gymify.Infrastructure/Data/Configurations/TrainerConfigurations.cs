@@ -17,7 +17,7 @@ namespace Gymify.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasDefaultValue(0);
 
-            builder.Property(t => t.IsActive)
+            builder.Property(t => t.IsAvailable)
                 .IsRequired()
                 .HasDefaultValue(true);
 

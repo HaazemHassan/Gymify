@@ -6,8 +6,8 @@ namespace Gymify.Application.Features.Trainers.Queries.GetTrainersForManagement.
 {
     public class TrainersForManagementPaginatedSpec : TrainersFilteredSpec
     {
-        public TrainersForManagementPaginatedSpec(int pageNumber, int pageSize, string? search = null, bool? isActive = null)
-            : base(search, isActive: isActive)
+        public TrainersForManagementPaginatedSpec(int pageNumber, int pageSize, string? search = null, bool? isAvailable = null, bool? isActive = null)
+            : base(search, isAvailable: isAvailable, isActive: isActive)
         {
             Query.OrderByDescending(t => t.CreatedAt);
             Query.Paginate(pageNumber, pageSize);
